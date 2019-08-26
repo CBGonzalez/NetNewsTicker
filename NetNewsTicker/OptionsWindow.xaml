@@ -1,0 +1,43 @@
+﻿<Window x:Class="NetNewsTicker.OptionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:local="clr-namespace:NetNewsTicker"
+        xmlns:localization="clr-namespace:NetNewsTicker.Properties"
+        WindowStartupLocation="Manual"
+        Left="{Binding OptionsLeft, Mode=TwoWay}"
+        Top="{Binding OptionsTop, Mode=TwoWay}"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        mc:Ignorable="d"
+        Visibility="{Binding ShowOptionsWindow}"
+        Title="Options" Height="182" Width="250" MinWidth="250" MinHeight="151" MaxWidth="300" MaxHeight="300">
+    <Window.Background>
+        <SolidColorBrush Color="#E0FF6600"></SolidColorBrush>
+    </Window.Background>
+    <Grid>
+        <Label Content="{x:Static localization:Resources.LabelRefresh}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <TextBox x:Name="refreshBox" HorizontalAlignment="Left" Height="25" Margin="194,38,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="38" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" ToolTip="{x:Static localization:Resources.RefreshToolTip}">
+            <TextBox.Text>
+                <Binding Path="NetworkRefresh" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
+                    <Binding.ValidationRules>
+                        <ExceptionValidationRule/>
+                    </Binding.ValidationRules>
+                </Binding>
+            </TextBox.Text>
+        </TextBox>
+        <Label Content="{x:Static localization:Resources.LabelNews}" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <ComboBox x:Name="servicesCombo" ItemsSource="{Binding ServicesList}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedService, Mode=TwoWay}" Width="150" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="82,68,0,0" VerticalContentAlignment="Center" SelectedIndex="{Binding SelectedServiceIndex, Mode=TwoWay}"/>
+        <Label Content="{x:Static localization:Resources.LabelShow}" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top" Foreground="White"/>
+        <ComboBox x:Name="displayCombo" ItemsSource="{Binding CategoriesList}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedCategory}" Width="150" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="82,99,0,0" SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" VerticalContentAlignment="Center"/>
+        <Button x:Name="btnSave" Command="{Binding OptionsSaveCommand}" Content="{x:Static localization:Resources.SaveButton}" Margin="17,10,0,0" VerticalAlignment="Top" Width="92" HorizontalAlignment="Left" RenderTransformOrigin="0.78,0.55" Background="#FFB8F5B2"/>
+        <Button x:Name="btnCancel" Command="{Binding OptionsCancelCommand}" Content="{x:Static localization:Resources.CancelButton}" Margin="140,10,0,0" VerticalAlignment="Top" Width="92" HorizontalAlignment="Left" RenderTransformOrigin="0.78,0.55" Background="#FFB8F5B2"/>
+        <!--<Button x:Name="btnDefaults" Content="{x:Static localization:Resources.DefaultsButton}" Margin="172,10,0,0" VerticalAlignment="Top" Width="75" HorizontalAlignment="Left" RenderTransformOrigin="0.78,0.55" Background="#FFB8F5B2"/> -->
+        <RadioButton x:Name="radioPrimary" Content="{x:Static localization:Resources.RadioPrimDisplay}" HorizontalAlignment="Left" Margin="16,132,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" IsChecked="{Binding UsePrimaryDisplay, FallbackValue=true, Mode=TwoWay}" GroupName="Displays" Foreground="White"/>
+        <RadioButton x:Name="radioSecondary" Content="{x:Static localization:Resources.RadioSecDisplay}" HorizontalAlignment="Left" Margin="132,132,0,0" VerticalAlignment="Top" Visibility="{Binding ShowSecDisplayRadioButton, Mode=TwoWay}" RenderTransformOrigin="0.306,-0.233" GroupName="Displays" Foreground="White"/>
+        <RadioButton x:Name="radioTop" Content="{x:Static localization:Resources.RadioTop}" IsChecked="{Binding UseTopTicker, FallbackValue=true, Mode=TwoWay}" HorizontalAlignment="Left" Margin="16,158,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
+        <RadioButton x:Name="radioBottom" Content="{x:Static localization:Resources.RadioBottom}" HorizontalAlignment="Left" Margin="132,158,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
+    </Grid>
+</Window>

@@ -1,0 +1,70 @@
+﻿<Window x:Name="ScrollWindow" x:Class="NetNewsTicker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"            
+        mc:Ignorable="d"
+        xmlns:localization="clr-namespace:NetNewsTicker.Properties"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Topmost="{Binding IsTopmost, Mode=TwoWay}"
+        WindowStartupLocation="Manual"
+        Icon="Images/ASPNETWebApplication_16x.png"
+        Left="{Binding Left, Mode=TwoWay}"
+        Top="{Binding Top, Mode=TwoWay}"
+        Width="{Binding Width, FallbackValue=800, Mode=TwoWay}"
+        
+        Title="NetNewsTicker" Height="32" Closing="ScrollWindow_Closing">
+    <Window.Background>
+        <SolidColorBrush Color="#33FF6600" ></SolidColorBrush>
+    </Window.Background>
+
+
+    <Canvas x:FieldModifier="public" x:Name="mainCanvas" Margin="0,0,0,0" Width="{Binding Width, FallbackValue=800}" Height ="32" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <StackPanel x:Name="iconPanel" Canvas.Left="0" Canvas.Top="8" Width="16" Height="16" Visibility="{Binding IsRefreshingNews, FallbackValue=Visible}">
+            <Image Source="Images/EventRed_16x.png"></Image>
+        </StackPanel>
+        <!--
+        <Label Name="progLabel" ToolTip="{Binding AnimationMS, FallbackValue=90}"  Canvas.Left="0" Canvas.Top="16" Width="16" Height="15" Content="{Binding AnimationMS, FallbackValue=90}" FontSize="5" HorizontalAlignment="Center" VerticalAlignment="Top" Foreground="#FFF9F5F5"/>
+        -->        
+        <Canvas x:Name="myCanvas" Width="{Binding ViewWidth, FallbackValue=734}" Height="30" Canvas.Left="18" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0" ClipToBounds="True" >
+            <ItemsControl x:Name="newsContainer" HorizontalAlignment="Left" VerticalAlignment="Top" Canvas.Left="0" ItemsSource="{Binding NewsButtons}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas Width="{Binding ViewWidth}" Height="30"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Canvas>
+        <Button x:Name="btnPause" Visibility="{Binding ShowPauseButton}" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Top="1" Canvas.Right="32" Margin="0,0,0,0" BorderBrush="{x:Null}" ToolTip="{x:Static localization:Resources.PauseButtonToolTip}" Command="{Binding ButtonPauseCommand}" BorderThickness="0">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/Pause_Red_LT_16X.png"/>
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnResume" Visibility="{Binding ShowResumeButton}" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Top="15" Canvas.Right="32" Margin="0,0,0,0" BorderBrush="{x:Null}" ToolTip="{x:Static localization:Resources.ResumeButtonToolTip}" Command="{Binding ButtonResumeCommand}" BorderThickness="0">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/Play_Green_LT_16X.png"/>
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnOptions" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Top="15" Canvas.Right="0" Margin="0,0,0,0" BorderBrush="{x:Null}" ToolTip="{x:Static localization:Resources.ButtonOptionsToolTip}" Command="{Binding ButtonOptionsCommand}" BorderThickness="0">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/Options_16X.ico"/>
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnFaster" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Right="17" Margin="0,0,0,0" BorderBrush="{x:Null}" Command="{Binding ButtonFasterCommand}" ToolTip="{x:Static localization:Resources.ButtonFasterToolTips}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/Up16.png"/>
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnExit" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Top="0" Canvas.Right="0" Margin="0,0,0,0" BorderBrush="{x:Null}" ToolTip="{x:Static localization:Resources.ButtonExitToolTips}" Command="{Binding ButtonExitCommand}" BorderThickness="0">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/CloseSolution_16x.png"/>
+            </StackPanel>
+        </Button>
+        <Button x:Name="btnSlower" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Top="15" Canvas.Right="17" Margin="0,0,0,0" BorderBrush="{x:Null}" Command="{Binding ButtonSlowerCommand}" BorderThickness="0" ToolTip="{x:Static localization:Resources.ButtonSlowerToolTips}">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="Images/Dn16.png"/>
+            </StackPanel>
+        </Button>
+    </Canvas>
+</Window>
