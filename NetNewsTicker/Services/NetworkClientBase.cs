@@ -10,7 +10,7 @@ using NetNewsTicker.Model;
 
 namespace NetNewsTicker.Services
 {
-    public class NetworkClientBase : INetworkClient
+    public abstract class NetworkClientBase : INetworkClient
     {
         private bool disposedValue = false; // To detect redundant calls
         
@@ -25,7 +25,7 @@ namespace NetNewsTicker.Services
         private protected bool canFetchAllAtOnce;
         private protected int maxItems;        
 
-        public bool CanFetchAllAtOnce => canFetchAllAtOnce;
+        //public bool CanFetchAllAtOnce => canFetchAllAtOnce;
         public int MaxItems => maxItems;
 
         internal NetworkClientBase()
@@ -104,10 +104,8 @@ namespace NetNewsTicker.Services
             return internetUp;
         }
 
-        public virtual async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
-        {            
-            return (false, null, "Must implement");            
-        }
+        public abstract Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel);
+        
 
         #region IDisposable Support
 

@@ -15,6 +15,7 @@ namespace NetNewsTicker.Services
     {
         
         private readonly DataContractJsonSerializer jasonSer;
+        private int currentMaxItem = 0;
        
         public YCombNetworkClient() : base()
         {                            
@@ -23,56 +24,56 @@ namespace NetNewsTicker.Services
             logFileName = "NewsTickerLog.txt";
         }
 
-        /*
-        private void NetworkChange_NetworkAvailabilityChanged(object sender, NetworkAvailabilityEventArgs e)
+        public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
         {
-            hasNetworkAccess = e.IsAvailable;
-            if (!hasNetworkAccess)
+            bool isOK;
+            string error;
+            List<IContentItem> fetchedItems = null;
+            (bool success, bool needsRefreshing, string errorMsg) = await GetMaxItemAsync(cancel);
+            isOK = success;
+            error = errorMsg;
+            if(isOK && needsRefreshing)
             {
-                hasInternetAccess = false;
+                (bool fetchedOK, List<int> list, string errorMessage) = await FetchItemIdsForPageAsync(itemsURL, cancel);
+                isOK = fetchedOK;
+                error = errorMessage;
+                
+                if(isOK && list.Count > 0 && !cancel.IsCancellationRequested)
+                {
+                    int howManyToFetch = list.Count >= howManyItems ? howManyItems : list.Count;
+                    fetchedItems = new List<IContentItem>(howManyToFetch);
+                    for(int i = 0; i < howManyToFetch; i++)
+                    {
+                        (bool itemOK, YCombItem item, _) = await GetOneItemAsync(list[i], cancel);
+                        isOK = itemOK;
+                        if(isOK)
+                        {
+                            if (item != null)
+                            {
+                                fetchedItems.Add(item);
+                            }
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
             }
+            return (isOK & needsRefreshing, fetchedItems, error);
         }
-
-        private bool IsNetworkup(ref NetworkInterface[] nics)
-        {
-            if (nics == null)
-            {
-                return false;
-            }
-            bool isUp = false;
-            foreach (NetworkInterface n in nics)
-            {
-                isUp |= n.OperationalStatus == OperationalStatus.Up;
-            }
-            return isUp;
-        } 
-
-        private static bool IsInternetReachable()
-        {
-            bool internetUp = false;
-            using (var myPing = new Ping())
-            {
-                var myPingOptions = new PingOptions();
-                byte[] buffer = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-                PingReply reply = myPing.Send("1.1.1.1", 2000);
-                internetUp |= reply.Status == IPStatus.Success;
-                reply = myPing.Send("8.8.8.8", 2000);
-                internetUp |= reply.Status == IPStatus.Success;
-            }
-            return internetUp;
-        } */
 
         /// <summary>
         /// Get the highest (newest) item ID currently on server
         /// </summary>
         /// <returns></returns>
-        public async Task<(bool success, uint itemID, string errorMsg)> GetMaxItemAsync(CancellationToken cancel)
+        private async Task<(bool success, bool needsRefresh, string errorMsg)> GetMaxItemAsync(CancellationToken cancel)
         {
             bool isOk = false;
             if (!hasNetworkAccess)
             {
                 Logger.Log("YCombNetworkClient: No network", Logger.Level.Error);
-                return (false, 0, "No network.");
+                return (false, false, "No network.");
             }
             if (!hasInternetAccess)
             {
@@ -80,11 +81,12 @@ namespace NetNewsTicker.Services
                 if (!hasInternetAccess)
                 {
                     Logger.Log("YCombNetworkClient: No Internet access", Logger.Level.Error);
-                    return (false, 0, "No Internet access");
+                    return (false, false, "No Internet access");
                 }
             }
             string error = string.Empty;
-            uint maxItem = 0;
+            int maxItem = 0;
+            bool needsRefresh = false;
             Logger.Log("Fetching highest item", Logger.Level.Information);
             try
             {
@@ -99,7 +101,7 @@ namespace NetNewsTicker.Services
                     else
                     {
                         string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        if (!uint.TryParse(responseBody, out maxItem))
+                        if (!int.TryParse(responseBody, out maxItem))
                         {
                             error = $"Trouble: error parsing maxitem. String returned was {responseBody}.";
                             Logger.Log(error, Logger.Level.Error);
@@ -107,6 +109,8 @@ namespace NetNewsTicker.Services
                         else
                         {
                             isOk = true;
+                            needsRefresh = maxItem > currentMaxItem;
+                            currentMaxItem = maxItem;
                             Logger.Log("GetMaxItem finished ok", Logger.Level.Information);
 #if DEBUG
                             Logger.Log($"Value retrieved {maxItem}", Logger.Level.Debug);
@@ -120,7 +124,7 @@ namespace NetNewsTicker.Services
             {
                 Logger.Log(te.ToString(), Logger.Level.Information);
             }
-            return (isOk, maxItem, error);
+            return (isOk, needsRefresh, error);
         }
 
         /// <summary>
@@ -129,11 +133,11 @@ namespace NetNewsTicker.Services
         /// <param name="page"></param>
         /// <param name="cancel"></param>
         /// <returns></returns>
-        public async Task<(bool, List<uint>, string)> FetchItemIdsForPageAsync(string page, CancellationToken cancel)
+        private async Task<(bool, List<int>, string)> FetchItemIdsForPageAsync(string page, CancellationToken cancel)
         {
             string error = "FetchItemIdsForPageAsync";
             HttpResponseMessage response = null;
-            List<uint> newIds = null;
+            List<int> newIds = null;
             bool success = false;
             try
             {
@@ -178,16 +182,16 @@ namespace NetNewsTicker.Services
             return (success, newIds, error);
         }
 
-        private static List<uint> GetIdsFromMem(ReadOnlyMemory<char> content)
+        private static List<int> GetIdsFromMem(ReadOnlyMemory<char> content)
         {
-            var ids = new List<uint>();
+            var ids = new List<int>();
             ReadOnlySpan<char> localContent = content.Span.Slice(1, content.Length - 2);
             ReadOnlySpan<char> currentSlice = localContent.Slice(0);
             int position = 0, commaPosition = localContent.IndexOf(',');
             int counter = 0;
             while (commaPosition >= 0)
             {                
-                ids.Add(uint.Parse(new string(currentSlice.Slice(position, commaPosition).ToArray()), NumberStyles.Integer, CultureInfo.InvariantCulture));
+                ids.Add(int.Parse(new string(currentSlice.Slice(position, commaPosition).ToArray()), NumberStyles.Integer, CultureInfo.InvariantCulture));
                 position = commaPosition + 1;
                 currentSlice = currentSlice.Slice(position);
                 commaPosition = currentSlice.IndexOf(',');
@@ -202,7 +206,7 @@ namespace NetNewsTicker.Services
         /// <param name="itemID"></param>
         /// <param name="cancel"></param>
         /// <returns></returns>
-        public async Task<(bool, YCombItem, string)> GetOneItemAsync(uint itemID, CancellationToken cancel)
+        private async Task<(bool, YCombItem, string)> GetOneItemAsync(int itemID, CancellationToken cancel)
         {
             var serType = new YCombItem();
             bool success = false;

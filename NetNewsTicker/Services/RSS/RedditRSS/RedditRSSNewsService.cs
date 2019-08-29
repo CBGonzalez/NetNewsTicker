@@ -5,28 +5,27 @@ namespace NetNewsTicker.Services.RSS.RedditRSS
 {
     public class RedditRSSNewsService : RSSNewsService
     {
-        public new enum NewsPage  { Front = 0, DotNetDeveloper = 1 }; // specific for Reddit RSS service        
+        public new enum NewsPage  { DotNetDeveloper = 0, Front = 1 }; // specific for Reddit RSS service        
 
         public RedditRSSNewsService() : base()
         {
             nwClient = new RedditRSSNetworkClient();            
-            viewIdsAndDescriptions = new List<(int, string)>() { (0, "Front page"), (1, "dotnetdeveloper") };
+            viewIdsAndDescriptions = new List<(int, string)>() { (0, "dotnetdeveloper"), (1, "Front page") };
             newItems = new List<IContentItem>();
-            maxNewsPageItem = (int)NewsPage.DotNetDeveloper;
+            maxNewsPageItem = (int)NewsPage.Front;
         }
         
         internal override void SetCorrectUrl(int page)
         {
             var nPage = (NewsPage)page;
             switch (nPage)
-            {
-                case NewsPage.Front:
-                    whichPage = "";
-                    break;
+            {                
                 case NewsPage.DotNetDeveloper:
                     whichPage = "/user/Alavan/m/dotnetdeveloper";
                     break;
-
+                case NewsPage.Front:
+                    whichPage = "";
+                    break;
             }
         }
     }

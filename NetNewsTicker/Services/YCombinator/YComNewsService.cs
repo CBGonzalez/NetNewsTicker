@@ -24,100 +24,75 @@ namespace NetNewsTicker.Services
             isRefreshing = true;
             sourceCancel = new CancellationTokenSource();
             cancelToken = sourceCancel.Token;
-            bool isSuccess = await GetNewestItemAsync(cancelToken).ConfigureAwait(false);
-            if(!isSuccess)
-            {                
-                return (false);
-            }
-            if(needsRefresh && !cancelToken.IsCancellationRequested)
-            {                
-                newItems.Clear();
-                var keepItems = new List<IContentItem>();
-                var newIds = new List<int>();
-                var keepIds = new List<int>();
-                (bool success, List<uint> list, string error) fetchIdsResult = await FetchIdsFromCurrentPageAsync(cancelToken).ConfigureAwait(false);
-                if (fetchIdsResult.success)
+            bool isOK = false;
+            try
+            {
+                (bool isSucces, List<IContentItem> list, string error) = await yClient.FetchAllItemsAsync(whichPage, itemCount, cancelToken);
+                isOK = isSucces;
+                errorMessage = error;
+                if (isOK && !cancelToken.IsCancellationRequested)
                 {
-                    int howManyToFetch = fetchIdsResult.list.Count >= itemCount ? itemCount : fetchIdsResult.list.Count;
+                    newItems.Clear();
+                    var keepItems = new List<IContentItem>();
+                    var newIds = new List<int>();
+                    var keepIds = new List<int>();
+
+                    int howManyToFetch = list.Count >= itemCount ? itemCount : list.Count;
+                    List<int> newIdsList = new List<int>(howManyToFetch);
+
                     for (int i = 0; i < howManyToFetch; i++)
-                    {              
-                        if(cancelToken.IsCancellationRequested)
+                    {
+                        newIdsList.Add(list[i].ItemId);
+                    }
+                    for (int i = 0; i < howManyToFetch; i++)
+                    {
+                        if (cancelToken.IsCancellationRequested)
                         {
-                            isSuccess = false;
+                            isOK = false;
                             break;
                         }
-                        if (!currentIds.Contains((int)fetchIdsResult.list[i]))
-                        {                            
-                            (bool success, YCombItem item, string error) = await yClient.GetOneItemAsync(fetchIdsResult.list[i], cancelToken).ConfigureAwait(false);
-                            if (!success)
-                            {
-                                errorMessage = error;
-                            }
-                            else if(item != null)
-                            {                                
-                                    newItems.Add(item);
-                                    newIds.Add(item.id);                                
-                            }                            
+                        if (!currentIds.Contains(newIdsList[i]))
+                        {
+                            newItems.Add(list[i]);
+                            newIds.Add(newIdsList[i]);
                         }
                         else
                         {
-                            keepItems.Add(currentItems.Find(x => x.ItemId == (int)fetchIdsResult.list[i]));                            
-                            keepIds.Add((int)fetchIdsResult.list[i]);
+                            keepItems.Add(list[i]);
+                            keepIds.Add(newIdsList[i]);
                         }
                     }
-                    if (isSuccess)
+
+                    currentItems.Clear();
+                    currentIds.Clear();
+                    foreach (IContentItem item in keepItems)
                     {
-                        // recreate current items (eliminates stale ones)
-                        currentItems.Clear();
-                        currentIds.Clear();
-                        foreach (IContentItem item in keepItems)
-                        {
-                            currentItems.Add(item);
-                            currentIds.Add(item.ItemId);
-                        }
-                        foreach (IContentItem item in newItems)
-                        {
-                            currentItems.Add(item);
-                            currentIds.Add(item.ItemId);
-                        }
+                        currentItems.Add(item);
+                        currentIds.Add(item.ItemId);
                     }
-                }                
+                    foreach (IContentItem item in newItems)
+                    {
+                        currentItems.Add(item);
+                        currentIds.Add(item.ItemId);
+                    }
+                }
+            }
+            catch(TaskCanceledException te)
+            {
+                errorMessage = $"{errorMessage}: {te.ToString()}";
+                Logger.Log(errorMessage, Logger.Level.Error);
             }
             if (sourceCancel != null)
             {
                 sourceCancel.Dispose();
             }
             sourceCancel = null;            
-            var e = new RefreshCompletedEventArgs(isSuccess);
+            var e = new RefreshCompletedEventArgs(isOK);
             OnRefreshCompleted(e);
             isRefreshing = false;
-            return isSuccess;
+            return isOK;
         }
         
-        private async Task<bool> GetNewestItemAsync(CancellationToken cancel)
-        {
-            (bool success, uint id, _) = await yClient.GetMaxItemAsync(cancel).ConfigureAwait(false);
-            if(success)
-            {
-                if (id != previousMaxItem)
-                {
-                    previousMaxItem = id;
-                    needsRefresh = true;
-                    Logger.Log("Refresh needed", Logger.Level.Information);
-                }
-                else
-                {
-                    Logger.Log("No refresh needed", Logger.Level.Information);
-                }
-            }
-            return success;
-        }
-        
-        private Task<(bool, List<uint>, string)> FetchIdsFromCurrentPageAsync(CancellationToken cancel)
-        {                                             
-            return yClient.FetchItemIdsForPageAsync(whichPage, cancel);
-        }        
-
         internal override void SetCorrectUrl(int page)
         {
             var nPage = (NewsPage)page;

@@ -5,17 +5,16 @@ using NetNewsTicker.Model;
 
 namespace NetNewsTicker.Services.RSS
 {
-    public class RSSNewsService : TickerCommunicationServiceBase
+    public abstract class RSSNewsService : TickerCommunicationServiceBase
     {
-        public new enum NewsPage { Front = 0, DotNetDeveloper = 1 }; // specific for Reddit RSS service
+        //public new enum NewsPage { DotNetDeveloper = 0, Front = 1 }; // specific for Reddit RSS service
 
 
         public RSSNewsService() : base()
         {
-            nwClient = new RSSNetworkClient();
-            viewIdsAndDescriptions = new List<(int, string)>() { (0, "Front page"), (1, "dotnetdeveloper") };
+            nwClient = new RSSNetworkClient();            
             newItems = new List<IContentItem>();
-            maxNewsPageItem = (int)NewsPage.DotNetDeveloper;
+            maxNewsPageItem = (int)NewsPage.Front;
         }
 
         public override async Task<bool> RefreshItemsAsync()
@@ -60,16 +59,6 @@ namespace NetNewsTicker.Services.RSS
             isRefreshing = false;
             return success;
         }
-
-        internal override void SetCorrectUrl(int page)
-        {
-            var nPage = (NewsPage)page;
-            switch (nPage)
-            {
-                case NewsPage.Front:
-                    whichPage = "/";
-                    break;                
-            }
-        }
+        
     }
 }

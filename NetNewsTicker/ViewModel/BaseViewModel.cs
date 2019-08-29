@@ -7,6 +7,7 @@ namespace NetNewsTicker.ViewModels
 {
     public class BaseViewModel : INotifyPropertyChanged, IDisposable
     {
+        private bool disposedValue = false; // To detect redundant calls
 
         #region Fields        
         private protected ItemsHandler contentHandler;
@@ -30,8 +31,7 @@ namespace NetNewsTicker.ViewModels
         }
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
-
+       
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

@@ -6,7 +6,7 @@ using NetNewsTicker.Model;
 
 namespace NetNewsTicker.Services
 {
-    public class TickerCommunicationServiceBase : ITickerCommunicationService
+    public abstract class TickerCommunicationServiceBase : ITickerCommunicationService
     {
         protected enum NewsPage { Front = 0 };
         private protected int maxNewsPageItem = 0;
@@ -182,11 +182,7 @@ namespace NetNewsTicker.Services
             return (success, error);
         }
 
-        internal virtual void SetCorrectUrl(int page)
-        {
-            // must implement in derived classes
-            whichPage = "/";
-        }
+        internal abstract void SetCorrectUrl(int page);        
        
         private protected virtual async void TimerCB(Object stateInfo)
         {
@@ -204,11 +200,8 @@ namespace NetNewsTicker.Services
             Interlocked.Exchange(ref isTimerCBRunning, 0);
         }
 
-        public virtual async Task<bool> RefreshItemsAsync()
-        {
-            // Must override
-            return false;
-        }
+        public abstract Task<bool> RefreshItemsAsync();
+        
         
         #region IDisposable Support
 

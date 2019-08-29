@@ -59,7 +59,6 @@ namespace NetNewsTicker.Services.RSS
                     }
                     else
                     {
-
                         ParseContent(rssFeed);
                     }
                     if (newContent.Count == 0)
@@ -72,14 +71,12 @@ namespace NetNewsTicker.Services.RSS
             }
             catch (HttpRequestException e)
             {
-                Logger.Log(e.ToString(), Logger.Level.Error);
-                //oneItem = null;
+                Logger.Log(e.ToString(), Logger.Level.Error);                
                 error += e.ToString();
             }
             catch (TaskCanceledException te)
             {
-                Logger.Log(te.ToString(), Logger.Level.Information);
-                //oneItem = null;
+                Logger.Log(te.ToString(), Logger.Level.Information);                
                 error += te.ToString();
             }
             finally

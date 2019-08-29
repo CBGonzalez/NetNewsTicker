@@ -15,7 +15,7 @@ namespace NetNewsTicker.Services.RSS.BBCNewsRSS
                                         ((int)NewsPage.Europe, "Europe"), ((int)NewsPage.UK, "UK"), ((int)NewsPage.US_Canada, "US & Canada"), ((int)NewsPage.Latin_America, "Latin America"), ((int)NewsPage.Asia, "Asia"),
                                         ((int)NewsPage.Africa, "Africa")};
             newItems = new List<IContentItem>();
-            maxNewsPageItem = (int)NewsPage.Asia;
+            maxNewsPageItem = (int)NewsPage.Africa;
         }                
 
         internal override void SetCorrectUrl(int page)
