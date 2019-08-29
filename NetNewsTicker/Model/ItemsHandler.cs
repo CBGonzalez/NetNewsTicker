@@ -19,7 +19,10 @@ namespace NetNewsTicker.Model
         private int refreshSeconds;        
         private int currentService;
         private readonly int maxService;
-       
+        private bool logEnabled;
+        private string logPath = string.Empty;
+
+        public string LogPath => logPath;
         public bool HasNewItems => hasNewItems;
         public List<IContentItem> NewContent => newContent;
         public List<IContentItem> AllContent => allContent;
@@ -58,8 +61,9 @@ namespace NetNewsTicker.Model
 
         public bool IsServiceRefreshing => tickerService.IsRefreshing;
 
-        public ItemsHandler(int refreshIntervalSeconds)
-        {                        
+        public ItemsHandler(int refreshIntervalSeconds, bool useLogging)
+        {
+            logEnabled = useLogging;
             hasNewItems = false;
             allServices = new List<(int, string)>();
             foreach (KeyValuePair<int, string> s in ServiceSelector.ServiceList)
@@ -68,8 +72,8 @@ namespace NetNewsTicker.Model
             }
             currentService = 0;
             maxService = allServices.Count - 1;            
-            tickerService = ServiceSelector.CreateService(currentService);
-            
+            tickerService = ServiceSelector.CreateService(currentService, logEnabled);
+            logPath = tickerService.LogPath;
             allContent = tickerService.GetAllItemsList();
             newContent = tickerService.GetNewItemsList();            
             if(tickerService.HasDifferentCategories)
@@ -128,6 +132,16 @@ namespace NetNewsTicker.Model
             tickerService.ResumeRefreshing();
         }
 
+        public void ControlLogging(bool doLoggings)
+        {
+            if(doLoggings != logEnabled)
+            {
+                logEnabled = doLoggings;
+                tickerService.ChangeLogging(logEnabled);
+                logPath = tickerService.LogPath;
+            }
+        }
+
         public void Close()
         {
             tickerService.StopRefreshing();            
@@ -149,8 +163,9 @@ namespace NetNewsTicker.Model
             if(newService <= maxService && currentService != newService)
             {                
                 hasNewItems = false;
-                currentService = newService;
-                tickerService = ServiceSelector.CreateService(newService);                
+                currentService = newService;                
+                tickerService = ServiceSelector.CreateService(newService, logEnabled);
+                logPath = tickerService.LogPath;
                 allContent = tickerService.GetAllItemsList();
                 newContent = tickerService.GetNewItemsList();                
                 if (tickerService.HasDifferentCategories)

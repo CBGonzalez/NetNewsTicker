@@ -14,10 +14,16 @@ namespace NetNewsTicker.Services
         {
             nwClient = new YCombNetworkClient();
             yClient = (YCombNetworkClient)nwClient;
-            yClient.InitializeNetworClient();
+            yClient.InitializeNetworClient(enableLogging);
+            logPath = yClient.LogLocation;
             maxNewsPageItem = 5;
             viewIdsAndDescriptions = new List<(int, string)>() { (0, "Front page"), (1, "Newest items"), (2, "Best items"), (3, "Ask HN"), (4, "Show HN"), (5, "Jobs") };
-        }       
+        }   
+        
+        public YComNewsService(bool useLogging) : this()
+        {
+            enableLogging = useLogging;
+        }
 
         public override async Task<bool> RefreshItemsAsync()
         {
@@ -38,7 +44,7 @@ namespace NetNewsTicker.Services
                     var keepIds = new List<int>();
 
                     int howManyToFetch = list.Count >= itemCount ? itemCount : list.Count;
-                    List<int> newIdsList = new List<int>(howManyToFetch);
+                    var newIdsList = new List<int>(howManyToFetch);
 
                     for (int i = 0; i < howManyToFetch; i++)
                     {

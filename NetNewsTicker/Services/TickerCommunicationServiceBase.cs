@@ -30,15 +30,19 @@ namespace NetNewsTicker.Services
         private protected int currentRefresh;
         private protected Delegate RefreshDelegate;
         private protected INetworkClient nwClient;
+        private protected bool enableLogging = false;
+        private protected string logPath = string.Empty;
 
         public string LastError => errorMessage;
         public bool IsRefreshing => isRefreshing;
+
+        public string LogPath => logPath;
 
         public TickerCommunicationServiceBase()
         {
             currentItems = new List<IContentItem>(itemCount);
             newItems = new List<IContentItem>();
-            currentIds = new List<int>();
+            currentIds = new List<int>();            
             for (int i = 0; i < itemCount; i++)
             {
                 currentIds.Add(0);
@@ -47,6 +51,11 @@ namespace NetNewsTicker.Services
             needsRefresh = true;
             isRefreshing = false;
             doRefreshing = true;
+        }
+
+        public TickerCommunicationServiceBase(bool doLogging) : this()
+        {
+            enableLogging = doLogging;            
         }
 
         public bool HasDifferentCategories => hasDifferentCategories;
@@ -180,6 +189,15 @@ namespace NetNewsTicker.Services
             SetCorrectUrl((int)currentPage);
             bool success = timer.Change(1000, refreshIntervalSeconds * 1000);
             return (success, error);
+        }
+
+        public void ChangeLogging(bool enable)
+        {
+            if (enable != enableLogging)
+            {
+                enableLogging = enable;
+                nwClient.ControlLogging(enableLogging);
+            }
         }
 
         internal abstract void SetCorrectUrl(int page);        

@@ -7,6 +7,9 @@ namespace NetNewsTicker.Services
 {
     public interface ITickerCommunicationService : IDisposable
     {
+
+        string LogPath { get; }
+
         bool HasDifferentCategories { get; }
 
         /// <summary>
@@ -62,6 +65,8 @@ namespace NetNewsTicker.Services
         bool ChangeDesiredRefreshInterval(int refreshIntervalSeconds);
 
         bool ChangeContentCategory(int newCategory);
+
+        void ChangeLogging(bool enable);
 
         //Task<bool> RefreshNewsAsync(List<(uint, NewsItemBase.NewsPage)> inList, ItemNews.NewsPage page, CancellationToken cancel);
         /// <summary>

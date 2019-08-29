@@ -23,10 +23,13 @@ namespace NetNewsTicker.Services
         private protected NetworkInterface[] nics;
         private protected bool hasNetworkAccess = false, hasInternetAccess = false;
         private protected bool canFetchAllAtOnce;
-        private protected int maxItems;        
+        private protected int maxItems;
+        private protected bool isLoggingEnabled;
+        private protected string logDirectory = string.Empty;
 
         //public bool CanFetchAllAtOnce => canFetchAllAtOnce;
         public int MaxItems => maxItems;
+        public string LogLocation => logDirectory;
 
         internal NetworkClientBase()
         {
@@ -37,17 +40,22 @@ namespace NetNewsTicker.Services
             }
         }
 
-        public void InitializeNetworClient()
+        public void InitializeNetworClient(bool enableLogging)
         {
             client.BaseAddress = newsServerBase;
-            string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-            if (!Directory.Exists(appDataFolder))
+            isLoggingEnabled = enableLogging;
+            if(isLoggingEnabled)
             {
-                Directory.CreateDirectory(appDataFolder);
+                SetupLogging();
             }
-            pathToLogfile = Path.Combine(appDataFolder, logFileName);
-            Logger.InitializeLogger(pathToLogfile);
-            Logger.Log("Starting network activity", Logger.Level.Information);
+            //string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+            //if (!Directory.Exists(appDataFolder))
+            //{
+            //    Directory.CreateDirectory(appDataFolder);
+            //}
+            //pathToLogfile = Path.Combine(appDataFolder, logFileName);
+            //Logger.InitializeLogger(pathToLogfile);
+            //Logger.Log("Starting network activity", Logger.Level.Information);
             nics = NetworkInterface.GetAllNetworkInterfaces();
             hasNetworkAccess = IsNetworkup(ref nics);            
             if (!hasNetworkAccess)
@@ -63,6 +71,42 @@ namespace NetNewsTicker.Services
                 }
             }
             NetworkChange.NetworkAvailabilityChanged += NetworkChange_NetworkAvailabilityChanged;
+        }
+
+        private void SetupLogging()
+        {
+            string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
+            if (!Directory.Exists(appDataFolder))
+            {
+                Directory.CreateDirectory(appDataFolder);
+            }
+            pathToLogfile = Path.Combine(appDataFolder, logFileName);
+            logDirectory = pathToLogfile;
+            Logger.InitializeLogger(pathToLogfile);
+            Logger.Log("Starting network activity", Logger.Level.Information);
+        }
+
+        public void ControlLogging(bool enable)
+        {
+            if(enable == isLoggingEnabled )
+            {
+                return;
+            }
+            if(enable)
+            {
+                isLoggingEnabled = enable;
+                SetupLogging();
+            }
+            else
+            {
+                StopLogging();
+            }
+        }
+
+        public void StopLogging()
+        {
+            logDirectory = string.Empty;
+            Logger.Close();
         }
 
         internal static bool IsNetworkup(ref NetworkInterface[] nics)

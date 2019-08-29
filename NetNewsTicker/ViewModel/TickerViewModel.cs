@@ -29,7 +29,7 @@ namespace NetNewsTicker.ViewModels
         private bool animateOn = true;
         private double refresh;
         private readonly double optWindowWidth = 250;
-        private readonly double optWindowHeight = 182;
+        private readonly double optWindowHeight = 210;
         private const double defaultRefresh = 3.0;
         private const int numberOfHeadlinesToDisplay = 25;
         #endregion
@@ -54,11 +54,14 @@ namespace NetNewsTicker.ViewModels
         private bool canPause = true;
         private bool isDoingRefresh;
         private List<IContentItem> refreshedItems;
-        private int selectedServiceIndex, selectedCategoryIndex;                
+        private int selectedServiceIndex, selectedCategoryIndex;
+        private bool isLogEnabled = false;
+        private string logLocation;
 
         // store current setting in order to restore them if user selects "Cancel" in options window
         private int currentServiceIndex, currentCategoryIndex;
         private double currentRefresh;
+        private bool currentLogging;
         #endregion
 
         #region simple bind targets
@@ -169,7 +172,8 @@ namespace NetNewsTicker.ViewModels
 
         private void InitializeItemsHandler()
         {
-            contentHandler = new ItemsHandler((int)refresh * 60);
+            contentHandler = new ItemsHandler((int)refresh * 60, isLogEnabled);
+            LogCheckTooltip = contentHandler.LogPath;
             if (contentHandler.AllCategories != null)
             {
                 categoriesList = new ObservableCollection<DropDownCategory>();
@@ -442,6 +446,7 @@ namespace NetNewsTicker.ViewModels
         {
             if (showOptionsWindow == Visibility.Visible)
             {
+                CancelOptionsClick();
                 return;
             }
             ShowOptionsWindow = Visibility.Visible;
@@ -463,6 +468,7 @@ namespace NetNewsTicker.ViewModels
                 ShowInfoButton = Visibility.Visible;
                 ResetPositions();
                 contentHandler.ChangeCurrentService(selectedNews);
+                LogCheckTooltip = contentHandler.LogPath;
                 DropDownCategory aCat;                
                 CategoriesList.Clear();
                 foreach ((int, string) item in contentHandler.AllCategories)
@@ -495,6 +501,12 @@ namespace NetNewsTicker.ViewModels
                 topIsCurrent = useTopTicker;
                 MoveWindowUpDown(useTopTicker);                
             }
+            if(isLogEnabled != currentLogging)
+            {
+                currentLogging = isLogEnabled;
+                ModifyLogging(isLogEnabled);
+                LogCheckTooltip = contentHandler.LogPath;
+            }
         }
 
         private void CancelOptionsClick()
@@ -521,6 +533,16 @@ namespace NetNewsTicker.ViewModels
             {
                 UseTopTicker = topIsCurrent;
             }
+            if (isLogEnabled != currentLogging)
+            {
+                IsLogEnabled = currentLogging;
+            }
+        }
+
+        private void ModifyLogging(bool doLog)
+        {
+            contentHandler.ControlLogging(doLog);
+            LogCheckTooltip = contentHandler.LogPath;
         }
         #endregion
 
@@ -565,6 +587,7 @@ namespace NetNewsTicker.ViewModels
                 }
             }
         }
+
         public int SelectedServiceIndex
         {
             get => selectedServiceIndex;
@@ -636,6 +659,34 @@ namespace NetNewsTicker.ViewModels
                 if(isTopMost != value)
                 {
                     isTopMost = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsLogEnabled
+        {
+            get => isLogEnabled;
+            set
+            {
+                if(isLogEnabled != value)
+                {
+                    isLogEnabled = value;
+                    NotifyPropertyChanged();
+                    //ModifyLogging(isLogEnabled);
+                    //LogCheckTooltip = contentHandler.LogPath;
+                }
+            }
+        }
+
+        public string LogCheckTooltip
+        {
+            get => logLocation;
+            set
+            {
+                if(logLocation != value)
+                {
+                    logLocation = value;
                     NotifyPropertyChanged();
                 }
             }

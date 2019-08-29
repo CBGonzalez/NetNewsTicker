@@ -32,7 +32,7 @@ namespace NetNewsTicker.Services
             (bool success, bool needsRefreshing, string errorMsg) = await GetMaxItemAsync(cancel);
             isOK = success;
             error = errorMsg;
-            if(isOK && needsRefreshing)
+            if(isOK && needsRefreshing && !cancel.IsCancellationRequested)
             {
                 (bool fetchedOK, List<int> list, string errorMessage) = await FetchItemIdsForPageAsync(itemsURL, cancel);
                 isOK = fetchedOK;

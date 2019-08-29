@@ -8,9 +8,10 @@ namespace NetNewsTicker.Services.RSS.BBCNewsRSS
         public new enum NewsPage { FrontPage = 0, World, Technology, Science_Environment, Europe, UK, US_Canada, Latin_America, Asia, Africa }; // specific for BBCNews RSS service
 
 
-        public BBCNewsRSSNewsService() : base()
+        public BBCNewsRSSNewsService(bool logEnabled) : base(logEnabled)
         {
             nwClient = new BBCNewsRSSNetworkClient();
+            
             viewIdsAndDescriptions = new List<(int, string)>() { ((int)NewsPage.FrontPage, "Top Stories"), ((int)NewsPage.World, "World"), ((int)NewsPage.Technology, "Technology"), ((int)NewsPage.Science_Environment, "Science & Environment"),
                                         ((int)NewsPage.Europe, "Europe"), ((int)NewsPage.UK, "UK"), ((int)NewsPage.US_Canada, "US & Canada"), ((int)NewsPage.Latin_America, "Latin America"), ((int)NewsPage.Asia, "Asia"),
                                         ((int)NewsPage.Africa, "Africa")};

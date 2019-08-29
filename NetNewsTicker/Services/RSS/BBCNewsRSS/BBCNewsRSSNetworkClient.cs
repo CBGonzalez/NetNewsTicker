@@ -11,7 +11,7 @@ namespace NetNewsTicker.Services.RSS.BBCNewsRSS
             rssTail = "/rss.xml";
             client.BaseAddress = newsServerBase;
             logFileName = "BBCNewsTicker-RSS.txt";            
-            InitializeNetworClient();
+            InitializeNetworClient(isLoggingEnabled);
         }        
 
         internal override void ParseContent(SyndicationFeed feed)

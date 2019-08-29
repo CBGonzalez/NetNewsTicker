@@ -132,6 +132,9 @@
   <data name="CancelButton" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
+  <data name="CheckboxLogging" xml:space="preserve">
+    <value>Protokollieren</value>
+  </data>
   <data name="DefaultsButton" xml:space="preserve">
     <value>Standard</value>
   </data>

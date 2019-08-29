@@ -13,7 +13,7 @@ namespace NetNewsTicker.Services
 
         public static Dictionary<int, string> ServiceList => serviceList;
 
-        public static ITickerCommunicationService CreateService(int whichService)
+        public static ITickerCommunicationService CreateService(int whichService, bool useLogging)
         {
             if (whichService > maxServiceIndex)
             {
@@ -28,13 +28,13 @@ namespace NetNewsTicker.Services
             switch(whichService)
             {
                 case 0:
-                    service = new YComNewsService();
+                    service = new YComNewsService(useLogging);
                     break;
                 case 1:
-                    service = new RedditRSSNewsService();
+                    service = new RedditRSSNewsService(useLogging);
                     break;
                 case 2:
-                    service = new BBCNewsRSSNewsService();
+                    service = new BBCNewsRSSNewsService(useLogging);
                     break;
             }
             return service;

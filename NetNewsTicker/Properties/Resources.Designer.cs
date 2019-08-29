@@ -106,6 +106,15 @@ namespace NetNewsTicker.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Log activities.
+        /// </summary>
+        public static string CheckboxLogging {
+            get {
+                return ResourceManager.GetString("CheckboxLogging", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Defaults.
         /// </summary>
         public static string DefaultsButton {

@@ -9,7 +9,7 @@ using NetNewsTicker.Model;
 
 namespace NetNewsTicker.Services.RSS
 {
-    public class RSSNetworkClient : NetworkClientBase
+    public abstract class RSSNetworkClient : NetworkClientBase
     {
         private protected readonly List<IContentItem> newContent;
         private protected string rssTail = "";

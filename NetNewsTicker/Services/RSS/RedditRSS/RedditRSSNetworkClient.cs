@@ -7,11 +7,11 @@ namespace NetNewsTicker.Services.RSS.RedditRSS
     {        
         public RedditRSSNetworkClient() : base()
         {
-            newsServerBase = new Uri("https://www.reddit.com");
+            newsServerBase = new Uri("https://www.reddit.com");            
             client.BaseAddress = newsServerBase;
             logFileName = "NewsTicker-RSS.txt";
             rssTail = "/new/.rss?sort=new";            
-            InitializeNetworClient();
+            InitializeNetworClient(isLoggingEnabled);
         }
 
         internal override void ParseContent(SyndicationFeed feed)

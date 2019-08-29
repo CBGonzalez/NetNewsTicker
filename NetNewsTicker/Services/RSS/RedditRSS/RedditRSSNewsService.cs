@@ -7,7 +7,7 @@ namespace NetNewsTicker.Services.RSS.RedditRSS
     {
         public new enum NewsPage  { DotNetDeveloper = 0, Front = 1 }; // specific for Reddit RSS service        
 
-        public RedditRSSNewsService() : base()
+        public RedditRSSNewsService(bool useLogging) : base(useLogging)
         {
             nwClient = new RedditRSSNetworkClient();            
             viewIdsAndDescriptions = new List<(int, string)>() { (0, "dotnetdeveloper"), (1, "Front page") };
@@ -15,6 +15,7 @@ namespace NetNewsTicker.Services.RSS.RedditRSS
             maxNewsPageItem = (int)NewsPage.Front;
         }
         
+       
         internal override void SetCorrectUrl(int page)
         {
             var nPage = (NewsPage)page;

@@ -7,14 +7,13 @@ namespace NetNewsTicker.Services.RSS
 {
     public abstract class RSSNewsService : TickerCommunicationServiceBase
     {
-        //public new enum NewsPage { DotNetDeveloper = 0, Front = 1 }; // specific for Reddit RSS service
+        //public new enum NewsPage { DotNetDeveloper = 0, Front = 1 }; // specific for Reddit RSS service        
 
-
-        public RSSNewsService() : base()
+        public RSSNewsService(bool useLogging) : base(useLogging)
         {
-            nwClient = new RSSNetworkClient();            
+            //nwClient = new RSSNetworkClient();            
             newItems = new List<IContentItem>();
-            maxNewsPageItem = (int)NewsPage.Front;
+            maxNewsPageItem = (int)NewsPage.Front;            
         }
 
         public override async Task<bool> RefreshItemsAsync()

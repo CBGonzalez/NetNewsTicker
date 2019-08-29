@@ -10,7 +10,9 @@ namespace NetNewsTicker.Services
     interface INetworkClient : IDisposable
     {
         int MaxItems { get; }
-        void InitializeNetworClient();
+        void InitializeNetworClient(bool enableLogging);
+
+        void ControlLogging(bool enable);
 
         Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel);
     }

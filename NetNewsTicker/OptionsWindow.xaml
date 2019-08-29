@@ -13,7 +13,7 @@
         AllowsTransparency="True"
         mc:Ignorable="d"
         Visibility="{Binding ShowOptionsWindow}"
-        Title="Options" Height="182" Width="250" MinWidth="250" MinHeight="151" MaxWidth="300" MaxHeight="300">
+        Title="Options" Height="210" Width="250" MinWidth="250" MinHeight="151" MaxWidth="300" MaxHeight="300">
     <Window.Background>
         <SolidColorBrush Color="#E0FF6600"></SolidColorBrush>
     </Window.Background>
@@ -39,5 +39,6 @@
         <RadioButton x:Name="radioSecondary" Content="{x:Static localization:Resources.RadioSecDisplay}" HorizontalAlignment="Left" Margin="132,132,0,0" VerticalAlignment="Top" Visibility="{Binding ShowSecDisplayRadioButton, Mode=TwoWay}" RenderTransformOrigin="0.306,-0.233" GroupName="Displays" Foreground="White"/>
         <RadioButton x:Name="radioTop" Content="{x:Static localization:Resources.RadioTop}" IsChecked="{Binding UseTopTicker, FallbackValue=true, Mode=TwoWay}" HorizontalAlignment="Left" Margin="16,158,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
         <RadioButton x:Name="radioBottom" Content="{x:Static localization:Resources.RadioBottom}" HorizontalAlignment="Left" Margin="132,158,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
+        <CheckBox Content="{x:Static localization:Resources.CheckboxLogging}" IsChecked="{Binding IsLogEnabled}" ToolTip="{Binding LogCheckTooltip}" HorizontalAlignment="Left" Margin="15,183,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>
