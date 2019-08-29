@@ -86,6 +86,7 @@ namespace NetNewsTicker.Model
                 {
                     logFile.WriteLine(logEntry);
                 }
+                logFile.WriteLine("Log closed");
                 logFile.Flush();
                 logFile.Close();
                 timer.Dispose();
