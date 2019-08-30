@@ -2,7 +2,7 @@
 
 While preparing to work for a "real" WPF app I needed to teach myself VMMW. This project is the result of it. There are probably many different ways to achieve a similar result, so don´t take anything here for dogma.
 
-#### The View - Model - Model View (VMMV) pattern ####
+#### The View - Model - Model View (MVVM) pattern ####
 
 In short, this is a pattern that will segregate the "view" of an application (i. e. the user interface, UI) from the "model" (i. e. the business logic and its data).The _model_ and the _view_ are brought together by the "view model" component(s) which will expose / convert the data so the UI can represent it. (See [this Wikipedia article](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) for an introduction to the pattern and [this blog post](https://blogs.msdn.microsoft.com/johngossman/2005/10/08/introduction-to-modelviewviewmodel-pattern-for-building-wpf-apps/) for the original introduction announcement from Microsoft)
 
