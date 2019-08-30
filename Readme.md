@@ -57,7 +57,7 @@ The location of the variable is defined by adding
 ```
 to the window´s constructor: `TVM` is a class containing, among other things, the variable `ShowPauseButton` that controls the visibility, based on internal logic. The element´s `DataContext` holds the source data for all bindings.
 
-> **! Warning !**: One of the most annoying aspects of WPF is the fact that you use `strings` to define bindings. Visual Studio´s IntelliSense does not offer any help when working on bindings in XAML, neither is any error or warning displayed if a binding is not found. It´s really easy to misspell something (for example "ShowPauseButton" above) and wonder while your binding doesn´t work.
+> :warning: One of the most annoying aspects of WPF is the fact that you use `strings` to define bindings. Visual Studio´s IntelliSense does not offer any help when working on bindings in XAML, neither is any error or warning displayed if a binding is not found. It´s really easy to misspell something (for example "ShowPauseButton" above) and wonder while your binding doesn´t work.
 
 The initialization of the `DataContext` could also be performed from XAML but I prefer to do this in the (practically empty!) code behind file...
 
