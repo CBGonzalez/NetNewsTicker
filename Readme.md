@@ -57,7 +57,7 @@ Notice that I defined a `DataContext` for the whole window (and it will be inher
 Notice also that for the above binding to work, the variable `ShowPauseButton` must be of type `System.Windows.Visibility`. WPF offers a handy way of [converting](https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8#data-conversion) data by implementing the [IValueConverter interface](https://docs.microsoft.com/en-us/dotnet/api/system.windows.data.ivalueconverter?view=netframework-4.8) for use in bindings. You could, for example, convert a `bool` value to a `Visibility` (there´s actually a [built-in converter](https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.booleantovisibilityconverter?redirectedfrom=MSDN&view=netframework-4.8) to do this), a `string` to a `double` etc. In the app I didn´t use this capability to keep things simpler.
 
 In order for runtime changes to a bound property to be noticed by the control, a class implementing the [`INotifyPropertyChanged`](https://docs.microsoft.com/en-us/dotnet/api/system.componentmodel.inotifypropertychanged.propertychanged?view=netframework-4.8) interface must be used, for example:
-```
+```C#
     public class BaseViewModel : INotifyPropertyChanged, IDisposable
     {
       public event PropertyChangedEventHandler PropertyChanged;
@@ -90,7 +90,7 @@ Here a generic `PropertyChangedEventHandler` is defined that can be used for any
 #### Binding Commands ####
 
 In the XAML definition of the pause `Button`
-```
+```XML.xaml
 <Button x:Name="btnPause" Visibility="{Binding ShowPauseButton}" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Top="1" Canvas.Right="32" Margin="0,0,0,0" BorderBrush="{x:Null}" ToolTip="Pause" Command="{Binding ButtonPauseCommand}" BorderThickness="0">
             <StackPanel Orientation="Horizontal">
                 <Image Source="Images/Pause_Red_LT_16X.png"/>
@@ -101,13 +101,13 @@ the `Command="{Binding ButtonPauseCommand}"` part defines what happens when the 
 
 The `ButtonPauseCommand` points to an object implementing the [`ICommand Interface`](https://docs.microsoft.com/en-us/dotnet/api/system.windows.input.icommand?view=netframework-4.8):
 
-```
+```C#
 ICommand ButtonPauseCommand = new RelayCommand(param => PauseButtonClick(), param => CanPause);
 ```
 
 `PauseButtonClick()` is just a simple function:
 
-```
+```C#
         private void PauseButtonClick()
         {
             animateOn = false;
@@ -120,7 +120,7 @@ ICommand ButtonPauseCommand = new RelayCommand(param => PauseButtonClick(), para
 It will set some variables and command the underlying service to stop fetching headlines.
 
 The real legwork happens in the `RelayCommand` class (from Josh Smith´s [Patterns - WPF Apps With The Model-View-ViewModel Design Pattern](https://msdn.microsoft.com/en-us/magazine/dd419663.aspx)). Instead of creating a full implementation of `ICommand` for every command we need, this class will implement it just once and generate our different commands´ logics. It is defined as:
-```
+```C#
     class RelayCommand : ICommand
     {        
         private readonly Action<object> _execute;
@@ -161,7 +161,7 @@ A user-editable field in the UI that needs validation can also be handled throug
 
 It is defined in XAML as
 
-```
+```XML.xaml
       <TextBox x:Name="refreshBox" HorizontalAlignment="Left" Height="25" Margin="181,33,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="38" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" ToolTip="{x:Static localization:Resources.RefreshToolTip}">
             <TextBox.Text>
                 <Binding Path="NetworkRefresh" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
@@ -179,7 +179,7 @@ The `Mode="TwoWay"` part makes the binding work in both directions: a change in 
 The `Binding.ValidationRules` determine which rule to use. In the above code snippet the built-in `ExceptionValidationRule` is used: whenever the validation throws an exception, the `TextBox` will change its appearance (by default receiving a red margin). You can define your own [`ValidationRule`](https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.validationrule?view=netframework-4.8) if needed, for example to check for valid numeric or date ranges. Custom UI changes to the element can be defined in a [`Validation.ErrorTemplate`](https://docs.microsoft.com/en-us/dotnet/api/system.windows.controls.validation.errortemplate?view=netframework-4.8). (Microsoft has a simple, full [example on Github](https://github.com/Microsoft/WPF-Samples/tree/master/Data%20Binding/BindValidation) showing such a template)
 
 The variable `NetworkRefresh` is defined as a `string`, backed by a `double`:
-```
+```C#
         public string NetworkRefresh
         {
             get => refresh.ToString("N1", System.Globalization.CultureInfo.CurrentCulture);
@@ -207,7 +207,7 @@ The ticker displays the headlines within a `Canvas`, as a series of `Button` ele
 
 In order to achieve this, the buttons are created programmatically beforehand and their `Content` property is bound to a [`ObservableCollection<string>`](https://docs.microsoft.com/en-us/dotnet/api/system.collections.objectmodel.observablecollection-1?view=netframework-4.8), which takes care of signaling the UI any time an object is added or modified.
 
-```
+```C#
 private var headlines = new ObservableCollection<string>();
 public ObservableCollection<string> Headlines => headlines;
 [...]
@@ -240,7 +240,7 @@ The animation (scrolling) is achieved by binding the buttons `Canvas.LeftPropert
 If using Visual Studio, you can [enable tracing for WPF](https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-display-wpf-trace-information?view=vs-2019) and your Output window will show details of what´s going on behind the scenes. You can choose what level of information is displayed. The slight disadvantage is that *all* or *no* bindings are traced, so if you want full details, you´ll get a lot of text to wade through.
 
 If you want to trace a specific binding with all its gory details, you use the above configuration to choose a low level of detail for all, then you include the following snippet in your XAML:
-```
+```XML.xaml
 <Window
     [...]
     xmlns:diag="clr-namespace:System.Diagnostics;assembly=WindowsBase"
@@ -248,12 +248,12 @@ If you want to trace a specific binding with all its gory details, you use the a
 </Window>
 ```
 Within the `Binding` you´re interested in you do
-```
+```XML.xaml
     <Binding diag:PresentationTraceSources.Tracelevel=High [...] />
 ```
 
 Alternatively, you can achieve the same in code:
-```
+```C#
 Binding bind = new Binding() { [...]  };
 System.Diagnostics.PresentationTraceSources.SetTraceLevel(bind, System.Diagnostics.PresentationTraceLevel.High);
 ```
