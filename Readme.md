@@ -1,6 +1,6 @@
 ## A MVVM WPF News Ticker in C# ##
 
-While preparing to work for a "real" WPF app I needed to teach myself VMMW. This project is the result of it. There are probably many different ways to achieve a similar result, so don´t take anything here for dogma.
+While preparing to work for a "real" WPF app I needed to teach myself MVVM. This project is the result of it. There are probably many different ways to achieve a similar result, so don´t take anything here for dogma.
 
 #### Contents ####
 - [The View - Model - Model View (MVVM) pattern](#MVVM)
