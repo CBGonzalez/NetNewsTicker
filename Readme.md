@@ -2,7 +2,16 @@
 
 While preparing to work for a "real" WPF app I needed to teach myself VMMW. This project is the result of it. There are probably many different ways to achieve a similar result, so don´t take anything here for dogma.
 
-#### The View - Model - Model View (MVVM) pattern ####
+#### Contents ####
+- [The View - Model - Model View (MVVM) pattern](#MVVM)
+- [The Ticker](#Ticker)
+- [Binding to Allow for Dynamic Behavior](#Dynamic)
+- [Binding Commands](#Commands)
+- [Binding with Data Entry and Validation](#Validation)
+- [Binding for Dynamic Content](#DynCont)
+- [Debugging Bindings](#Debugging)
+
+#### <a name="MVVM"/>The View - Model - Model View (MVVM) pattern ####
 
 In short, this is a pattern that will segregate the "view" of an application (i. e. the user interface, UI) from the "model" (i. e. the business logic and its data).The _model_ and the _view_ are brought together by the "view model" component(s) which will expose / convert the data so the UI can represent it. (See [this Wikipedia article](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel) for an introduction to the pattern and [this blog post](https://blogs.msdn.microsoft.com/johngossman/2005/10/08/introduction-to-modelviewviewmodel-pattern-for-building-wpf-apps/) for the original introduction announcement from Microsoft)
 
@@ -14,7 +23,7 @@ Microsoft´s schematic view of this (as seen in this [introduction to implementi
 
 WPF (the Windows Presentation Foundation) is well suited for this pattern since it offers extensive [data binding](https://docs.microsoft.com/en-us/dotnet/framework/wpf/data/data-binding-overview?view=netframework-4.8) capabilities. This allows the UI to react to changes in the underlying data (through the bindings) in order to refresh content, change its appearance or send back user input data to the model. Any UI element´s [attached property](https://docs.microsoft.com/en-us/dotnet/framework/wpf/advanced/attached-properties-overview) can be bound.
 
-#### The Ticker ####
+#### <a name="Ticker"/> The Ticker ####
 
 ![NewsTicker screenshot](AdditionalFiles/Screeny.png)
 
@@ -24,7 +33,7 @@ A schematic view of the project can be found [here](AdditionalFiles/SchematicVie
 
 The headlines are displayed as buttons scrolling across the screen. When clicked, the corresponding page is displayed in your default browser. For Hacker News, a right click will display the item´s discussion page. On the right, a few buttons allow for some control: pause, resume, accelerate and slow down the scrolling, configuration and an exit button.
 
-#### Binding to Allow for Dynamic Behavior ####
+#### <a name="Dynamic"/> Binding to Allow for Dynamic Behavior ####
 
 The scrolling (and the refreshing of data) can be paused using a button on the UI. The button will only display if there are headlines to show, and if the display isn´t paused already:
 
@@ -87,7 +96,7 @@ In order for runtime changes to a bound property to be noticed by the control, a
 ```
 Here a generic `PropertyChangedEventHandler` is defined that can be used for any property. The property´s name is passed due to the [`[CallerMemberName]` attribute](https://docs.microsoft.com/en-us/dotnet/api/system.runtime.compilerservices.callermembernameattribute?view=netframework-4.8). Whenever the variable `ShowPauseButton` changes its value, a call to `NotifypropertyChanged()` will trigger an event containing the name of the changed variable, so the UI can update itself.
 
-#### Binding Commands ####
+#### <a name="Commands"/> Binding Commands ####
 
 In the XAML definition of the pause `Button`
 ```XML.xaml
@@ -153,7 +162,7 @@ It´s constructor takes the function as the first argument. The second argument 
 
 In the case of the pause button it points to a `bool` value defining if there are items being scrolled.
 
-#### Binding with Data Entry and Validation ####
+#### <a name="Validation"/> Binding with Data Entry and Validation ####
 
 A user-editable field in the UI that needs validation can also be handled through bindings. The news ticker has a window with configuration options, one of them expecting a numerical value.
 
@@ -201,7 +210,7 @@ The variable `NetworkRefresh` is defined as a `string`, backed by a `double`:
 ```
 Notice that the setter throws an `Exception` if the parsing of the `string` to a `double` does not work, signaling the UI to notify the user.
 
-#### Binding for Dynamic Content ####
+#### <a name="DynCont"/> Binding for Dynamic Content ####
 
 The ticker displays the headlines within a `Canvas`, as a series of `Button` elements. These scroll across the screen, from right to left in the current implementation. The underlying news service will refresh the headlines periodically and this needs to be reflected in the UI.
 
@@ -235,7 +244,7 @@ The animation (scrolling) is achieved by binding the buttons `Canvas.LeftPropert
 
 > **! Notice that one of the "hidden" advantages of using data binding is that you can change a UI element´s content or characteristics from a thread that is *not* the UI thread without cumbersome `BeginInvokes` to the UI `Dispatcher` by working on the data sources instead !**
 
-#### Debugging Bindings ####
+#### <a name="Debugging"/> Debugging Bindings ####
 
 If using Visual Studio, you can [enable tracing for WPF](https://docs.microsoft.com/en-us/visualstudio/debugger/how-to-display-wpf-trace-information?view=vs-2019) and your Output window will show details of what´s going on behind the scenes. You can choose what level of information is displayed. The slight disadvantage is that *all* or *no* bindings are traced, so if you want full details, you´ll get a lot of text to wade through.
 
