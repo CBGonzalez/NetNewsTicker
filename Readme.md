@@ -242,7 +242,7 @@ The `Mode = BindingMode.OneWay` part defines the binding to be *from* the data s
 
 The animation (scrolling) is achieved by binding the buttons `Canvas.LeftProperty` to an `ObservableCollection<double>`. This collection is updated several times a second in its own thread.
 
-> ** :white_check_mark: Notice that one of the "hidden" advantages of using data binding is that you can change a UI element´s content or characteristics from a thread that is *not* the UI thread without cumbersome `BeginInvokes` to the UI `Dispatcher` by working on the data sources instead !**
+> :white_check_mark: Notice that one of the "hidden" advantages of using data binding is that you can change a UI element´s content or characteristics from a thread that is *not* the UI thread without cumbersome `BeginInvokes` to the UI `Dispatcher` by working on the data sources instead !
 
 #### <a name="Debugging"/> Debugging Bindings ####
 
