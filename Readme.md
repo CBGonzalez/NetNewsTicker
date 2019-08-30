@@ -31,7 +31,7 @@ The scrolling (and the refreshing of data) can be paused using a button on the U
 ![Pause button](AdditionalFiles/Pause.png)
 
 It is defined in XAML as:
-```
+```XML.xaml
 <Button x:Name="btnPause" Visibility="{Binding ShowPauseButton}" Width="16" Height="16" Background="#00DDDDDD" HorizontalAlignment="Right" VerticalAlignment="Top" Canvas.Top="1" Canvas.Right="32" Margin="0,0,0,0" BorderBrush="{x:Null}" ToolTip="Pause" Command="{Binding ButtonPauseCommand}" BorderThickness="0">
             <StackPanel Orientation="Horizontal">
                 <Image Source="Images/Pause_Red_LT_16X.png"/>
@@ -42,7 +42,7 @@ The `Visibility="{Binding ShowPauseButton}"` part binds the button´s visibility
 
 The location of the variable is defined by adding
 
-```
+```C#
             TVM = new TickerViewModel();            
             DataContext = TVM;
 ```
