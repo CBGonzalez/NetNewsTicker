@@ -406,9 +406,13 @@ namespace NetNewsTicker.ViewModels
             e.Handled = true;
         }
 
-        private void ExitButtonClick()
+        private async void ExitButtonClick()
         {
             contentHandler.PauseRefresh();
+            while (contentHandler.IsServiceRefreshing)
+            {
+                await Task.Delay(100);
+            }
             contentHandler.Close();
             Application.Current.Shutdown();
         }
