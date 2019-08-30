@@ -236,13 +236,13 @@ Initially, the headlines are created with a `string.Empty` `Content`. After refr
 
 The binding is defined via `contentBinding = new Binding($"Headlines[{i}]") { Mode = BindingMode.OneWay };`: each button binds to a specific item in the Headlines list (Headlines[i]).
 
-> **! Notice** again the use of a `string` to define a binding. Beware of misspellings!
+> :warning: Notice again the use of a `string` to define a binding. Beware of misspellings!
 
 The `Mode = BindingMode.OneWay` part defines the binding to be *from* the data source *to* the UI. Any change within the UI does not reflect back to the data. See the docs for the [BindingMode enum](https://docs.microsoft.com/en-us/dotnet/api/system.windows.data.bindingmode?view=netframework-4.8) for more options.
 
 The animation (scrolling) is achieved by binding the buttons `Canvas.LeftProperty` to an `ObservableCollection<double>`. This collection is updated several times a second in its own thread.
 
-> **! Notice that one of the "hidden" advantages of using data binding is that you can change a UI element´s content or characteristics from a thread that is *not* the UI thread without cumbersome `BeginInvokes` to the UI `Dispatcher` by working on the data sources instead !**
+> ** :white_check_mark: Notice that one of the "hidden" advantages of using data binding is that you can change a UI element´s content or characteristics from a thread that is *not* the UI thread without cumbersome `BeginInvokes` to the UI `Dispatcher` by working on the data sources instead !**
 
 #### <a name="Debugging"/> Debugging Bindings ####
 
