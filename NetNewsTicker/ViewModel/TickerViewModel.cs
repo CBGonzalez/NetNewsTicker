@@ -24,13 +24,13 @@ namespace NetNewsTicker.ViewModels
         private Button infoButton;
         private readonly Typeface buttonTypeFace;
         
-        private double animationDurationMs;
-        private double animationStep = 1.0;
-        private bool animateOn = true;
-        private double refresh;
-        private readonly double optWindowWidth = 250;
+        private double animationDurationMs; //TODO implement
+        private double animationStep = 1.0; // used to accelerate / slow down animation spee
+        private bool animateOn = true; // toggles animation on / off
+        private double refreshIntervalMin;
+        private readonly double optWindowWidth = 280;
         private readonly double optWindowHeight = 210;
-        private const double defaultRefresh = 3.0;
+        private const double defaultRefreshMin = 5.0;
         private const int numberOfHeadlinesToDisplay = 25;
         #endregion
 
@@ -60,7 +60,7 @@ namespace NetNewsTicker.ViewModels
 
         // store current setting in order to restore them if user selects "Cancel" in options window
         private int currentServiceIndex, currentCategoryIndex;
-        private double currentRefresh;
+        private double currentRefreshMin;
         private bool currentLogging;
         #endregion
 
@@ -107,8 +107,8 @@ namespace NetNewsTicker.ViewModels
             selectedCategoryIndex = currentCategoryIndex = 0;
             selectedServiceIndex = currentServiceIndex = 0;
             
-            refresh = defaultRefresh;
-            currentRefresh = refresh;
+            refreshIntervalMin = defaultRefreshMin;
+            currentRefreshMin = refreshIntervalMin;
 
             SetupWindows(UsePrimaryDisplay);            
             InitializeBindingCommands();
@@ -172,7 +172,7 @@ namespace NetNewsTicker.ViewModels
 
         private void InitializeItemsHandler()
         {
-            contentHandler = new ItemsHandler((int)refresh * 60, isLogEnabled);
+            contentHandler = new ItemsHandler((int)refreshIntervalMin * 60, isLogEnabled);
             LogCheckTooltip = contentHandler.LogPath;
             if (contentHandler.AllCategories != null)
             {
@@ -455,10 +455,10 @@ namespace NetNewsTicker.ViewModels
         private void SaveOptionsClick()
         {
             ShowOptionsWindow = Visibility.Hidden;
-            if(refresh != currentRefresh)
+            if(refreshIntervalMin != currentRefreshMin)
             {
-                currentRefresh = refresh;
-                contentHandler.ChangeRefreshInterval((int)refresh * 60);
+                currentRefreshMin = refreshIntervalMin;
+                contentHandler.ChangeRefreshInterval((int)refreshIntervalMin * 60);
             }
             if(selectedNews != SelectedService.Id)
             {                
@@ -512,9 +512,9 @@ namespace NetNewsTicker.ViewModels
         private void CancelOptionsClick()
         {
             ShowOptionsWindow = Visibility.Hidden;
-            if(currentRefresh != refresh)
+            if(currentRefreshMin != refreshIntervalMin)
             {
-                NetworkRefresh = currentRefresh.ToString("N1", System.Globalization.CultureInfo.CurrentCulture);
+                NetworkRefresh = currentRefreshMin.ToString("N1", System.Globalization.CultureInfo.CurrentCulture);
             }
             if(currentServiceIndex != selectedServiceIndex)
             {
@@ -856,13 +856,13 @@ namespace NetNewsTicker.ViewModels
 
         public string NetworkRefresh
         {
-            get => refresh.ToString("N1", System.Globalization.CultureInfo.CurrentCulture);
+            get => refreshIntervalMin.ToString("N1", System.Globalization.CultureInfo.CurrentCulture);
 
             set
             {
                 if (double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.CurrentCulture, out double refr))
                 {
-                    refresh = refr;
+                    refreshIntervalMin = refr;
                     NotifyPropertyChanged();
                 }
                 else
