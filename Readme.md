@@ -20,6 +20,8 @@ WPF (the Windows Presentation Foundation) is well suited for this pattern since 
 
 The news ticker will periodically fetch headlines from [Hacker News](https://news.ycombinator.com/news) using its [API](https://github.com/HackerNews/API), from a select group of [reddit communities](https://www.reddit.com/) via [RSS](https://www.reddit.com/wiki/rss) and from [BBCNews](https://www.bbc.com/news), also via [its RSS service](https://www.bbc.com/news/10628494).
 
+A schematic view of the project can be found [here](AdditionalFiles/SchematicView.md).
+
 The headlines are displayed as buttons scrolling across the screen. When clicked, the corresponding page is displayed in your default browser. For Hacker News, a right click will display the item´s discussion page. On the right, a few buttons allow for some control: pause, resume, accelerate and slow down the scrolling, configuration and an exit button.
 
 #### Binding to Allow for Dynamic Behavior ####
