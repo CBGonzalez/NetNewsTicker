@@ -10,16 +10,34 @@
         Left="{Binding OptionsLeft, Mode=TwoWay}"
         Top="{Binding OptionsTop, Mode=TwoWay}"
         WindowStyle="None"
-        AllowsTransparency="True"
+        AllowsTransparency="True"        
         mc:Ignorable="d"
         Visibility="{Binding ShowOptionsWindow}"
-        Title="Options" Height="210" Width="250" MinWidth="250" MinHeight="151" MaxWidth="300" MaxHeight="300">
+        Title="Options" Height="210" Width="264" MinWidth="250" MinHeight="210" MaxWidth="300" MaxHeight="300">
     <Window.Background>
         <SolidColorBrush Color="#E0FF6600"></SolidColorBrush>
     </Window.Background>
     <Grid>
-        <Label Content="{x:Static localization:Resources.LabelRefresh}" HorizontalAlignment="Left" Margin="10,38,0,0" VerticalAlignment="Top" Foreground="White"/>
-        <TextBox x:Name="refreshBox" HorizontalAlignment="Left" Height="25" Margin="194,38,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="38" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" ToolTip="{x:Static localization:Resources.RefreshToolTip}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition SharedSizeGroup="Buttons"/>
+            <ColumnDefinition />
+            <ColumnDefinition SharedSizeGroup="Buttons"/>
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Button x:Name="btnSave" Grid.Column="1" Grid.ColumnSpan="2" Command="{Binding OptionsSaveCommand}" Content="{x:Static localization:Resources.SaveButton}" VerticalAlignment="Center" Width="125" HorizontalAlignment="Left" Background="#FFB8F5B2" Margin="2,0,0,0"/>
+        <Button x:Name="btnCancel" Grid.Column="3" Grid.ColumnSpan="2" Command="{Binding OptionsCancelCommand}" Content="{x:Static localization:Resources.CancelButton}" VerticalAlignment="Center" Width="125" HorizontalAlignment="Left" Background="#FFB8F5B2" Margin="0"/>
+        <Label Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2" Content="{x:Static localization:Resources.LabelRefresh}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
+        <TextBox Grid.Column="3" Grid.Row="1" x:Name="refreshBox" HorizontalAlignment="Left" Height="25" TextWrapping="Wrap"  VerticalAlignment="Center" Width="38" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" ToolTip="{x:Static localization:Resources.RefreshToolTip}" Margin="0,2,0,0">
             <TextBox.Text>
                 <Binding Path="NetworkRefresh" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged">
                     <Binding.ValidationRules>
@@ -28,17 +46,15 @@
                 </Binding>
             </TextBox.Text>
         </TextBox>
-        <Label Content="{x:Static localization:Resources.LabelNews}" HorizontalAlignment="Left" Margin="10,68,0,0" VerticalAlignment="Top" Foreground="White"/>
-        <ComboBox x:Name="servicesCombo" ItemsSource="{Binding ServicesList}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedService, Mode=TwoWay}" Width="150" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="82,68,0,0" VerticalContentAlignment="Center" SelectedIndex="{Binding SelectedServiceIndex, Mode=TwoWay}"/>
-        <Label Content="{x:Static localization:Resources.LabelShow}" HorizontalAlignment="Left" Margin="10,99,0,0" VerticalAlignment="Top" Foreground="White"/>
-        <ComboBox x:Name="displayCombo" ItemsSource="{Binding CategoriesList}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedCategory}" Width="150" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="82,99,0,0" SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" VerticalContentAlignment="Center"/>
-        <Button x:Name="btnSave" Command="{Binding OptionsSaveCommand}" Content="{x:Static localization:Resources.SaveButton}" Margin="17,10,0,0" VerticalAlignment="Top" Width="92" HorizontalAlignment="Left" RenderTransformOrigin="0.78,0.55" Background="#FFB8F5B2"/>
-        <Button x:Name="btnCancel" Command="{Binding OptionsCancelCommand}" Content="{x:Static localization:Resources.CancelButton}" Margin="140,10,0,0" VerticalAlignment="Top" Width="92" HorizontalAlignment="Left" RenderTransformOrigin="0.78,0.55" Background="#FFB8F5B2"/>
+        <Label Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2" Content="{x:Static localization:Resources.LabelShow}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
+        <ComboBox Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2" x:Name="servicesCombo" ItemsSource="{Binding ServicesList}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedService, Mode=TwoWay}" Width="125" Height="25" HorizontalAlignment="Left" VerticalAlignment="Top" VerticalContentAlignment="Center" SelectedIndex="{Binding SelectedServiceIndex, Mode=TwoWay}" Margin="0,2,0,0"/>
+        <Label Grid.Row="3" Grid.Column="1" Content="{x:Static localization:Resources.LabelNews}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
+        <ComboBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" x:Name="displayCombo" ItemsSource="{Binding CategoriesList}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedCategory}" Width="125" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center" SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" VerticalContentAlignment="Center"/>
         <!--<Button x:Name="btnDefaults" Content="{x:Static localization:Resources.DefaultsButton}" Margin="172,10,0,0" VerticalAlignment="Top" Width="75" HorizontalAlignment="Left" RenderTransformOrigin="0.78,0.55" Background="#FFB8F5B2"/> -->
-        <RadioButton x:Name="radioPrimary" Content="{x:Static localization:Resources.RadioPrimDisplay}" HorizontalAlignment="Left" Margin="16,132,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" IsChecked="{Binding UsePrimaryDisplay, FallbackValue=true, Mode=TwoWay}" GroupName="Displays" Foreground="White"/>
-        <RadioButton x:Name="radioSecondary" Content="{x:Static localization:Resources.RadioSecDisplay}" HorizontalAlignment="Left" Margin="132,132,0,0" VerticalAlignment="Top" Visibility="{Binding ShowSecDisplayRadioButton, Mode=TwoWay}" RenderTransformOrigin="0.306,-0.233" GroupName="Displays" Foreground="White"/>
-        <RadioButton x:Name="radioTop" Content="{x:Static localization:Resources.RadioTop}" IsChecked="{Binding UseTopTicker, FallbackValue=true, Mode=TwoWay}" HorizontalAlignment="Left" Margin="16,158,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
-        <RadioButton x:Name="radioBottom" Content="{x:Static localization:Resources.RadioBottom}" HorizontalAlignment="Left" Margin="132,158,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
-        <CheckBox Content="{x:Static localization:Resources.CheckboxLogging}" IsChecked="{Binding IsLogEnabled}" ToolTip="{Binding LogCheckTooltip}" HorizontalAlignment="Left" Margin="15,183,0,0" VerticalAlignment="Top"/>
+        <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" x:Name="radioPrimary" Content="{x:Static localization:Resources.RadioPrimDisplay}" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.306,-0.233" IsChecked="{Binding UsePrimaryDisplay, FallbackValue=true, Mode=TwoWay}" GroupName="Displays" Foreground="White"/>
+        <RadioButton Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2" x:Name="radioSecondary" Content="{x:Static localization:Resources.RadioSecDisplay}" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="{Binding ShowSecDisplayRadioButton, Mode=TwoWay}" RenderTransformOrigin="0.306,-0.233" GroupName="Displays" Foreground="White"/>
+        <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" x:Name="radioTop" Content="{x:Static localization:Resources.RadioTop}" IsChecked="{Binding UseTopTicker, FallbackValue=true, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
+        <RadioButton Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2" x:Name="radioBottom" Content="{x:Static localization:Resources.RadioBottom}" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
+        <CheckBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Content="{x:Static localization:Resources.CheckboxLogging}" IsChecked="{Binding IsLogEnabled}" ToolTip="{Binding LogCheckTooltip}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>
     </Grid>
 </Window>
