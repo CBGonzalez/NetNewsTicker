@@ -18,7 +18,7 @@ namespace NetNewsTicker.Services.RSS
         public bool HasLink => hasLink;
         public bool HasSummary => hasSummary;
         public string Link => link;
-        public string SecondaryLink => secondaryLink;
+        public string SecondaryLink => link; // no secondary link;
         public bool HasSubItems => false;
         public Memory<int> SubItems => null;
         public DateTime ItemCreationDate => itemCreationDate;

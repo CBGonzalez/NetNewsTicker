@@ -386,9 +386,11 @@ namespace NetNewsTicker.ViewModels
             }
             
             (_, _, string secondary) = ((string, string, string))but.ToolTip;
-            
-            var p = Process.Start(secondary);
-            p.Dispose();
+            if (secondary != string.Empty)
+            {
+                var p = Process.Start(secondary);
+                p.Dispose();
+            }
             e.Handled = true;
         }
 
