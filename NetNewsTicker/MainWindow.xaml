@@ -9,6 +9,7 @@
         AllowsTransparency="True"
         Topmost="{Binding IsTopmost, Mode=TwoWay}"
         WindowStartupLocation="Manual"
+        
         Icon="Images/ASPNETWebApplication_16x.png"
         Left="{Binding Left, Mode=TwoWay}"
         Top="{Binding Top, Mode=TwoWay}"

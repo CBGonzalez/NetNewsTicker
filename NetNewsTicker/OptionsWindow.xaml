@@ -10,7 +10,8 @@
         Left="{Binding OptionsLeft, Mode=TwoWay}"
         Top="{Binding OptionsTop, Mode=TwoWay}"
         WindowStyle="None"
-        AllowsTransparency="True"        
+        AllowsTransparency="True"  
+        TextOptions.TextFormattingMode="Display"
         mc:Ignorable="d"
         Visibility="{Binding ShowOptionsWindow}"
         Title="Options" Height="210" Width="264" MinWidth="250" MinHeight="210" MaxWidth="300" MaxHeight="300">
