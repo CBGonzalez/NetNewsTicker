@@ -16,18 +16,24 @@ namespace NetNewsTicker.Services
         
         private readonly DataContractJsonSerializer jasonSer;
         private int currentMaxItem = 0;
+        private bool mustRefresh = false;
        
         public YCombNetworkClient() : base()
         {                            
             jasonSer = new DataContractJsonSerializer((new YCombItem()).GetType());  
             newsServerBase = new Uri("https://hacker-news.firebaseio.com/v0/");
-            logFileName = "NewsTickerLog.txt";
+            logFileName = "NewsTickerLog.txt";            
         }
 
         public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
         {
             bool isOK;
-            string error;
+            string error;            
+            mustRefresh = howManyItems <= 0;
+            if(mustRefresh)
+            {
+                howManyItems = 50;
+            }
             List<IContentItem> fetchedItems = null;
             (bool success, bool needsRefreshing, string errorMsg) = await GetMaxItemAsync(cancel);
             isOK = success;
@@ -109,7 +115,8 @@ namespace NetNewsTicker.Services
                         else
                         {
                             isOk = true;
-                            needsRefresh = maxItem > currentMaxItem;
+                            needsRefresh = (maxItem > currentMaxItem) | mustRefresh;
+                            mustRefresh = false;
                             currentMaxItem = maxItem;
                             Logger.Log("GetMaxItem finished ok", Logger.Level.Information);
 #if DEBUG

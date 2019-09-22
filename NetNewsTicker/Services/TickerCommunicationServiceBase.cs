@@ -32,6 +32,7 @@ namespace NetNewsTicker.Services
         private protected INetworkClient nwClient;
         private protected bool enableLogging = false;
         private protected string logPath = string.Empty;
+        private protected bool forceRefresh = false;
 
         public string LastError => errorMessage;
         public bool IsRefreshing => isRefreshing;
@@ -110,6 +111,7 @@ namespace NetNewsTicker.Services
                 currentPage = (NewsPage)newCategory;
                 SetCorrectUrl(newCategory);
                 isOk = true;
+                forceRefresh = true; // added to fix bug in YCombinator service: would show empty list when quickly changing category
             }
             return isOk;
         }
@@ -211,10 +213,11 @@ namespace NetNewsTicker.Services
             }
             if (isRefreshing | !doRefreshing)
             {
+                _ = Interlocked.Exchange(ref isTimerCBRunning, 0); // bug: release the lock here also, otherwise resume refreshing doesn[t work... duh!
                 return;
             }
             OnRefreshStarted(null);
-            bool _ = await RefreshItemsAsync().ConfigureAwait(false);
+            _ = await RefreshItemsAsync().ConfigureAwait(false);
             Interlocked.Exchange(ref isTimerCBRunning, 0);
         }
 

@@ -8,7 +8,7 @@ namespace NetNewsTicker.Services
     public class YComNewsService : TickerCommunicationServiceBase
     {
         public new enum NewsPage { Front = 0, Newest = 1, Best = 2, Ask = 3, Show = 4, Job = 5 };             
-        private readonly YCombNetworkClient yClient;
+        private readonly YCombNetworkClient yClient;        
         
         public YComNewsService() : base()
         {
@@ -25,16 +25,25 @@ namespace NetNewsTicker.Services
             enableLogging = useLogging;
         }
 
+        
         public override async Task<bool> RefreshItemsAsync()
         {
             isRefreshing = true;
             sourceCancel = new CancellationTokenSource();
             cancelToken = sourceCancel.Token;
             bool isOK = false;
+            int oldItemCount = itemCount;            
+            if (forceRefresh)
+            {
+                oldItemCount = itemCount;
+                itemCount = -1;
+                forceRefresh = false;
+            }
             try
             {
                 (bool isSucces, List<IContentItem> list, string error) = await yClient.FetchAllItemsAsync(whichPage, itemCount, cancelToken);
                 isOK = isSucces;
+                itemCount = oldItemCount;
                 errorMessage = error;
                 if (isOK && !cancelToken.IsCancellationRequested)
                 {
@@ -95,6 +104,7 @@ namespace NetNewsTicker.Services
             sourceCancel = null;            
             var e = new RefreshCompletedEventArgs(isOK);
             OnRefreshCompleted(e);
+            itemCount = oldItemCount;
             isRefreshing = false;
             return isOK;
         }
