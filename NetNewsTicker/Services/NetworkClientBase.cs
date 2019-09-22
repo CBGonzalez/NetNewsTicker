@@ -168,6 +168,7 @@ namespace NetNewsTicker.Services
                     if(response != null)
                     {
                         response.Dispose();
+                        response = null;
                     }
                     Logger.Log("Disposing NetworkClient", Logger.Level.Information);
                     Logger.Close();
