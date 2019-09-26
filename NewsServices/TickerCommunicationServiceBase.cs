@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using NetNewsTicker.Model;
 
-namespace NetNewsTicker.Services
+namespace NewsServices
 {
     public abstract class TickerCommunicationServiceBase : ITickerCommunicationService
     {
@@ -30,7 +30,7 @@ namespace NetNewsTicker.Services
         private protected int currentRefresh;
         private protected Delegate RefreshDelegate;
         private protected INetworkClient nwClient;
-        private protected bool enableLogging;
+        private protected bool enableLogging = false;
         private protected string logPath = string.Empty;
         private protected bool forceRefresh = false;
 

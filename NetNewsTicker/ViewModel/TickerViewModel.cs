@@ -32,6 +32,7 @@ namespace NetNewsTicker.ViewModels
         private readonly double optWindowHeight = 210;
         private const double defaultRefreshMin = 5.0;
         private const int numberOfHeadlinesToDisplay = 25;
+        private Dictionary<int, List<string>> allServicesPages;
         #endregion
 
         #region backer fields
@@ -173,6 +174,7 @@ namespace NetNewsTicker.ViewModels
         private void InitializeItemsHandler()
         {
             contentHandler = new ItemsHandler((int)refreshIntervalMin * 60, isLogEnabled);
+            allServicesPages = contentHandler.AllServicesPages;
             LogCheckTooltip = contentHandler.LogPath;
             if (contentHandler.AllCategories != null)
             {
@@ -184,17 +186,30 @@ namespace NetNewsTicker.ViewModels
                     aCat = new DropDownCategory(item.Item1, item.Item2);
                     ServicesList.Add(aCat);
                 }
-                foreach ((int, string) item in contentHandler.AllCategories)
-                {
-                    aCat = new DropDownCategory(item.Item1, item.Item2);
-                    CategoriesList.Add(aCat);
-                }
-                SelectedCategory = categoriesList[0];
+                PopulateCategories(0);                
                 SelectedService = servicesList[0];
             }            
             contentHandler.ItemsRefreshCompletedHandler += ContentHandler_ItemsRefreshCompletedHandler;
             contentHandler.ItemsRefreshStartedHandler += ContentHandler_ItemsRefreshStartedHandler;
             refreshedItems = contentHandler.NewContent;
+        }
+
+        // Added to allow correct pages to display immediately after user selects new service
+        private void PopulateCategories(int forWhichService)
+        {            
+            DropDownCategory aCat;
+            int counter = 0;
+            if (allServicesPages.TryGetValue(forWhichService, out List<string> pagesList))
+            {                
+                categoriesList.Clear();
+                foreach(string pageName in pagesList)
+                {
+                    aCat = new DropDownCategory(counter, pageName);
+                    CategoriesList.Add(aCat);
+                    counter++;
+                }
+                SelectedCategory = categoriesList[0];
+            }
         }
         
         private async void CreateInitialItems()
@@ -467,25 +482,20 @@ namespace NetNewsTicker.ViewModels
                 contentHandler.ChangeRefreshInterval((int)refreshIntervalMin * 60);
             }
             if(selectedNews != SelectedService.Id)
-            {                
+            {
                 selectedNews = SelectedService.Id;
                 currentServiceIndex = selectedNews;
                 ShowItemButtons = Visibility.Hidden;
                 ShowInfoButton = Visibility.Visible;
                 ResetPositions();
-                contentHandler.ChangeCurrentService(selectedNews);
-                LogCheckTooltip = contentHandler.LogPath;
-                DropDownCategory aCat;                
-                CategoriesList.Clear();
-                foreach ((int, string) item in contentHandler.AllCategories)
-                {
-                    aCat = new DropDownCategory(item.Item1, item.Item2);
-                    CategoriesList.Add(aCat);
-                }
+                selectedPage = SelectedCategory.Id;
+                contentHandler.ChangeCurrentService(selectedNews, selectedPage, isLogEnabled);
+                LogCheckTooltip = contentHandler.LogPath;                
+                PopulateCategories(selectedNews);                
                 refreshedItems = contentHandler.NewContent;
-                SelectedCategory = categoriesList[0];
-                SelectedCategoryIndex = 0;
-                currentCategoryIndex = 0;
+                SelectedCategory = categoriesList[selectedPage];
+                SelectedCategoryIndex = selectedPage;
+                currentCategoryIndex = selectedPage;
             }
             if (selectedPage != SelectedCategory.Id)
             {
@@ -603,6 +613,7 @@ namespace NetNewsTicker.ViewModels
                 {
                     selectedServiceIndex = value;
                     NotifyPropertyChanged();
+                    PopulateCategories(selectedServiceIndex);
                 }
             }
         }
@@ -679,7 +690,7 @@ namespace NetNewsTicker.ViewModels
                 {
                     isLogEnabled = value;
                     NotifyPropertyChanged();
-                    //ModifyLogging(isLogEnabled);
+                    ModifyLogging(isLogEnabled);
                     //LogCheckTooltip = contentHandler.LogPath;
                 }
             }

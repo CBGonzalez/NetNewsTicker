@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NetNewsTicker.Model;
 
-namespace NetNewsTicker.Services.RSS.RedditRSS
+namespace NewsServices
 {
     public class RedditRSSNewsService : RSSNewsService
     {
@@ -9,7 +9,7 @@ namespace NetNewsTicker.Services.RSS.RedditRSS
 
         public RedditRSSNewsService(bool useLogging) : base(useLogging)
         {
-            nwClient = new RedditRSSNetworkClient();
+            nwClient = new RedditRSSNetworkClient();            
             viewIdsAndDescriptions = new List<(int, string)>() { (0, "dotnetdeveloper"), (1, "Front page") };
             newItems = new List<IContentItem>();
             maxNewsPageItem = (int)NewsPage.Front;
