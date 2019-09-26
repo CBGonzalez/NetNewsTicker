@@ -21,6 +21,7 @@ namespace NetNewsTicker.Model
         private readonly int maxService;
         private bool logEnabled;
         private string logPath = string.Empty;
+        private readonly Dictionary<int, List<string>> allServicesPages;
 
         public string LogPath => logPath;
         public bool HasNewItems => hasNewItems;
@@ -28,6 +29,7 @@ namespace NetNewsTicker.Model
         public List<IContentItem> AllContent => allContent;
         public int CurrentCategory => currentCategory;
         public List<(int, string)> AllCategories => allCategories;
+        public Dictionary<int, List<string>> AllServicesPages => allServicesPages;
 
         public List<(int, string)> AllServices => allServices;
 
@@ -66,6 +68,7 @@ namespace NetNewsTicker.Model
             logEnabled = useLogging;
             hasNewItems = false;
             allServices = new List<(int, string)>();
+            allServicesPages = ServiceSelector.ServicesItems;
             foreach (KeyValuePair<int, string> s in ServiceSelector.ServiceList)
             {
                 allServices.Add((s.Key, s.Value));
@@ -158,10 +161,12 @@ namespace NetNewsTicker.Model
             }
         }
 
-        public void ChangeCurrentService(int newService)
+        public void ChangeCurrentService(int newService, int whichPage = 0, bool enableLogging = false)
         {
             if(newService <= maxService && currentService != newService)
-            {                
+            {
+                logEnabled = enableLogging;
+                currentCategory = whichPage;
                 hasNewItems = false;
                 currentService = newService;                
                 tickerService = ServiceSelector.CreateService(newService, logEnabled);
@@ -172,7 +177,8 @@ namespace NetNewsTicker.Model
                 {
                     allCategories = tickerService.ViewIdsAndDescriptions;
                 }
-                tickerService.ChangeContentCategory(0);
+                //tickerService.ChangeContentCategory(0);
+                tickerService.ChangeContentCategory(currentCategory);
                 tickerService.RefreshCompletedHandler += TickerService_RefreshCompletedHandler;
                 tickerService.RefreshStartedHandler += TickerService_RefreshStartedHandler;                
                 tickerService.StartRefreshing(refreshSeconds, currentCategory);                

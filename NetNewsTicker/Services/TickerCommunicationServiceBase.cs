@@ -30,7 +30,7 @@ namespace NetNewsTicker.Services
         private protected int currentRefresh;
         private protected Delegate RefreshDelegate;
         private protected INetworkClient nwClient;
-        private protected bool enableLogging = false;
+        private protected bool enableLogging;
         private protected string logPath = string.Empty;
         private protected bool forceRefresh = false;
 
