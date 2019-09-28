@@ -5,7 +5,7 @@ namespace NetNewsTicker.Services.RSS.BBCNewsRSS
 {
     internal class BBCNewsRSSNetworkClient : RSSNetworkClient
     {        
-        public BBCNewsRSSNetworkClient() : base()
+        public BBCNewsRSSNetworkClient(bool enableLogging) : base(enableLogging)
         {
             newsServerBase = new Uri("https://feeds.bbci.co.uk");
             rssTail = "/rss.xml";

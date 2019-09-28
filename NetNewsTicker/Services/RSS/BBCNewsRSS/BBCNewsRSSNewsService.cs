@@ -10,7 +10,7 @@ namespace NetNewsTicker.Services.RSS.BBCNewsRSS
 
         public BBCNewsRSSNewsService(bool logEnabled) : base(logEnabled)
         {
-            nwClient = new BBCNewsRSSNetworkClient();
+            nwClient = new BBCNewsRSSNetworkClient(logEnabled);
             
             viewIdsAndDescriptions = new List<(int, string)>() { ((int)NewsPage.FrontPage, "Top Stories"), ((int)NewsPage.World, "World"), ((int)NewsPage.Technology, "Technology"), ((int)NewsPage.Science_Environment, "Science & Environment"),
                                         ((int)NewsPage.Europe, "Europe"), ((int)NewsPage.UK, "UK"), ((int)NewsPage.US_Canada, "US & Canada"), ((int)NewsPage.Latin_America, "Latin America"), ((int)NewsPage.Asia, "Asia"),

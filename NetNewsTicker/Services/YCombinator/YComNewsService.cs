@@ -7,22 +7,22 @@ namespace NetNewsTicker.Services
 {
     public class YComNewsService : TickerCommunicationServiceBase
     {
-        public new enum NewsPage { Front = 0, Newest = 1, Best = 2, Ask = 3, Show = 4, Job = 5 };             
-        private readonly YCombNetworkClient yClient;        
-        
-        public YComNewsService() : base()
+        public new enum NewsPage { Front = 0, Newest = 1, Best = 2, Ask = 3, Show = 4, Job = 5 };
+        private readonly YCombNetworkClient yClient;
+
+        public YComNewsService() : this(false)
         {
+        }
+
+        public YComNewsService(bool useLogging) : base(useLogging)
+        {
+            enableLogging = useLogging;
             nwClient = new YCombNetworkClient();
             yClient = (YCombNetworkClient)nwClient;
             yClient.InitializeNetworClient(enableLogging);
             logPath = yClient.LogLocation;
             maxNewsPageItem = 5;
             viewIdsAndDescriptions = new List<(int, string)>() { (0, "Front page"), (1, "Newest items"), (2, "Best items"), (3, "Ask HN"), (4, "Show HN"), (5, "Jobs") };
-        }   
-        
-        public YComNewsService(bool useLogging) : this()
-        {
-            enableLogging = useLogging;
         }
 
         
