@@ -48,14 +48,6 @@ namespace NetNewsTicker.Services
             {
                 SetupLogging();
             }
-            //string appDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), appName);
-            //if (!Directory.Exists(appDataFolder))
-            //{
-            //    Directory.CreateDirectory(appDataFolder);
-            //}
-            //pathToLogfile = Path.Combine(appDataFolder, logFileName);
-            //Logger.InitializeLogger(pathToLogfile);
-            //Logger.Log("Starting network activity", Logger.Level.Information);
             nics = NetworkInterface.GetAllNetworkInterfaces();
             hasNetworkAccess = IsNetworkup(ref nics);            
             if (!hasNetworkAccess)

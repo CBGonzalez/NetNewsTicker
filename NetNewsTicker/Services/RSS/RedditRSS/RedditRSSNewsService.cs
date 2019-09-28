@@ -9,7 +9,7 @@ namespace NetNewsTicker.Services.RSS.RedditRSS
 
         public RedditRSSNewsService(bool useLogging) : base(useLogging)
         {
-            nwClient = new RedditRSSNetworkClient();
+            nwClient = new RedditRSSNetworkClient(useLogging);
             viewIdsAndDescriptions = new List<(int, string)>() { (0, "dotnetdeveloper"), (1, "Front page") };
             newItems = new List<IContentItem>();
             maxNewsPageItem = (int)NewsPage.Front;

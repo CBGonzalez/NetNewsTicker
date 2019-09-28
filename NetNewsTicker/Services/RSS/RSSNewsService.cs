@@ -7,8 +7,6 @@ namespace NetNewsTicker.Services.RSS
 {
     public abstract class RSSNewsService : TickerCommunicationServiceBase
     {
-        //public new enum NewsPage { DotNetDeveloper = 0, Front = 1 }; // specific for Reddit RSS service        
-
         public RSSNewsService(bool useLogging) : base(useLogging)
         {
             //nwClient = new RSSNetworkClient();            

@@ -5,7 +5,7 @@ namespace NetNewsTicker.Services.RSS.RedditRSS
 {
     internal class RedditRSSNetworkClient : RSSNetworkClient
     {        
-        public RedditRSSNetworkClient() : base()
+        public RedditRSSNetworkClient(bool enableLogging) : base(enableLogging)
         {
             newsServerBase = new Uri("https://www.reddit.com");            
             client.BaseAddress = newsServerBase;

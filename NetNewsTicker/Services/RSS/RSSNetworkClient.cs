@@ -14,8 +14,9 @@ namespace NetNewsTicker.Services.RSS
         private protected readonly List<IContentItem> newContent;
         private protected string rssTail = "";
 
-        public RSSNetworkClient()
-        {            
+        public RSSNetworkClient(bool enableLogging)
+        {
+            isLoggingEnabled = enableLogging;
             maxItems = 50; // we only get up to 50 via RSS
             newContent = new List<IContentItem>();
             canFetchAllAtOnce = true;
