@@ -13,10 +13,10 @@ namespace NetNewsTicker.Services
     public abstract class NetworkClientBase : INetworkClient
     {
         private bool disposedValue = false; // To detect redundant calls
-        
+
         private protected HttpClient client = null;
         private protected HttpResponseMessage response = null;
-        private protected Uri newsServerBase; 
+        private protected Uri newsServerBase;
         private protected const string appName = "NETNewsTicker";
         private protected string logFileName;
         private protected string pathToLogfile;
@@ -36,7 +36,7 @@ namespace NetNewsTicker.Services
             if (client == null)
             {
                 client = new HttpClient();
-                client.DefaultRequestHeaders.Add("User-Agent", $"{appName} C# 1.0 {Environment.OSVersion.ToString()}");                
+                client.DefaultRequestHeaders.Add("User-Agent", $"{appName} C# 1.0 {Environment.OSVersion.ToString()}");
             }
         }
 
@@ -44,12 +44,12 @@ namespace NetNewsTicker.Services
         {
             client.BaseAddress = newsServerBase;
             isLoggingEnabled = enableLogging;
-            if(isLoggingEnabled)
+            if (isLoggingEnabled)
             {
                 SetupLogging();
             }
             nics = NetworkInterface.GetAllNetworkInterfaces();
-            hasNetworkAccess = IsNetworkup(ref nics);            
+            hasNetworkAccess = IsNetworkup(ref nics);
             if (!hasNetworkAccess)
             {
                 Logger.Log("No network access detected!", Logger.Level.Error);
@@ -57,7 +57,7 @@ namespace NetNewsTicker.Services
             else
             {
                 hasInternetAccess = IsInternetReachable();
-                if(!hasInternetAccess)
+                if (!hasInternetAccess)
                 {
                     Logger.Log("No Internet access available!", Logger.Level.Error);
                 }
@@ -80,11 +80,11 @@ namespace NetNewsTicker.Services
 
         public void ControlLogging(bool enable)
         {
-            if(enable == isLoggingEnabled )
+            if (enable == isLoggingEnabled)
             {
                 return;
             }
-            if(enable)
+            if (enable)
             {
                 isLoggingEnabled = enable;
                 SetupLogging();
@@ -121,7 +121,7 @@ namespace NetNewsTicker.Services
             hasNetworkAccess = e.IsAvailable;
             if (!hasNetworkAccess)
             {
-                hasInternetAccess = false;                
+                hasInternetAccess = false;
             }
         }
 
@@ -141,7 +141,7 @@ namespace NetNewsTicker.Services
         }
 
         public abstract Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel);
-        
+
 
         #region IDisposable Support
 
@@ -157,7 +157,7 @@ namespace NetNewsTicker.Services
                         client.Dispose();
                         client = null;
                     }
-                    if(response != null)
+                    if (response != null)
                     {
                         response.Dispose();
                         response = null;
@@ -175,7 +175,7 @@ namespace NetNewsTicker.Services
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }        
+        }
 
         #endregion
 

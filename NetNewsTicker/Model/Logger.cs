@@ -17,13 +17,13 @@ namespace NetNewsTicker.Model
 
         public static (bool, string) InitializeLogger(string logFileName)
         {
-            if(isInitialized)
+            if (isInitialized)
             {
                 return (false, "Already initialized");
             }
             bool success = false;
             string errorMessage = string.Empty;
-            if(String.IsNullOrEmpty(logFileName))
+            if (String.IsNullOrEmpty(logFileName))
             {
                 return (success, "Invalid file name for log, empty or null");
             }
@@ -36,7 +36,7 @@ namespace NetNewsTicker.Model
                 isInitialized = true;
                 success = true;
             }
-            catch(IOException ex)
+            catch (IOException ex)
             {
                 errorMessage = ex.ToString();
             }
@@ -45,16 +45,16 @@ namespace NetNewsTicker.Model
 
         public static void Log(string entry, Level level)
         {
-            if(!isInitialized)
+            if (!isInitialized)
             {
                 return;
-            }            
-            logs.Enqueue(item: $"{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToLongTimeString()}\t{level.ToString()}\t{entry}");            
+            }
+            logs.Enqueue(item: $"{DateTime.Now.ToShortDateString()}-{DateTime.Now.ToLongTimeString()}\t{level.ToString()}\t{entry}");
         }
 
         private static void TimerTick(object state)
         {
-            if(logs.IsEmpty)
+            if (logs.IsEmpty)
             {
                 return;
             }
@@ -62,11 +62,11 @@ namespace NetNewsTicker.Model
             if (stillRunning)
             {
                 return;
-            }                                   
+            }
             while (logs.TryDequeue(out string logEntry))
             {
                 logFile.WriteLine(logEntry);
-            }                    
+            }
             Interlocked.Exchange(ref syncPoint, 0); // Signal that we are done            
         }
 
@@ -81,7 +81,7 @@ namespace NetNewsTicker.Model
                     Thread.Sleep(10);
                 }
                 Interlocked.Exchange(ref syncPoint, 1); //prevent timer callback from running
-                             
+
                 while (logs.TryDequeue(out string logEntry)) // Try to get a full log
                 {
                     logFile.WriteLine(logEntry);

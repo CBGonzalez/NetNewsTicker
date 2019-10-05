@@ -23,16 +23,17 @@ namespace NetNewsTicker.Services
             logPath = yClient.LogLocation;
             maxNewsPageItem = 5;
             viewIdsAndDescriptions = new List<(int, string)>() { (0, "Front page"), (1, "Newest items"), (2, "Best items"), (3, "Ask HN"), (4, "Show HN"), (5, "Jobs") };
+            maximumItems = 100; // allow up to 100 news items (arbitrary, api gives out up to 500)
         }
 
-        
+
         public override async Task<bool> RefreshItemsAsync()
         {
             isRefreshing = true;
             sourceCancel = new CancellationTokenSource();
             cancelToken = sourceCancel.Token;
             bool isOK = false;
-            int oldItemCount = itemCount;            
+            int oldItemCount = itemCount;
             if (forceRefresh)
             {
                 oldItemCount = itemCount;
@@ -92,7 +93,7 @@ namespace NetNewsTicker.Services
                     }
                 }
             }
-            catch(TaskCanceledException te)
+            catch (TaskCanceledException te)
             {
                 errorMessage = $"{errorMessage}: {te.ToString()}";
                 Logger.Log(errorMessage, Logger.Level.Error);
@@ -101,14 +102,14 @@ namespace NetNewsTicker.Services
             {
                 sourceCancel.Dispose();
             }
-            sourceCancel = null;            
+            sourceCancel = null;
             var e = new RefreshCompletedEventArgs(isOK);
             OnRefreshCompleted(e);
             itemCount = oldItemCount;
             isRefreshing = false;
             return isOK;
         }
-        
+
         internal override void SetCorrectUrl(int page)
         {
             var nPage = (NewsPage)page;

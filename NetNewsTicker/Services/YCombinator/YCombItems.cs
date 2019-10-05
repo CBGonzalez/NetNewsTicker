@@ -11,56 +11,56 @@ namespace NetNewsTicker.Services
         private const string hackerComments = "https://news.ycombinator.com/item?id=";
 
         #region JSON stuff
-        #pragma warning disable IDE1006
-            [DataMember]
-            public int id { get; set; }
+#pragma warning disable IDE1006
+        [DataMember]
+        public int id { get; set; }
 
-            [DataMember]
-            public bool deleted { get; set; }
+        [DataMember]
+        public bool deleted { get; set; }
 
-            [DataMember]
-            public string type { get; set; }
+        [DataMember]
+        public string type { get; set; }
 
-            [DataMember]
-            public string by { get; set; }
+        [DataMember]
+        public string by { get; set; }
 
-            [DataMember]
-            public long time { get; set; }
+        [DataMember]
+        public long time { get; set; }
 
-            [DataMember]
-            public string text { get; set; }
+        [DataMember]
+        public string text { get; set; }
 
-            [DataMember]
-            public bool dead { get; set; }
+        [DataMember]
+        public bool dead { get; set; }
 
-            [DataMember]
-            public int parent { get; set; }
+        [DataMember]
+        public int parent { get; set; }
 
-            [DataMember]
-            public int poll { get; set; }
-            #pragma warning disable CA1819
-            [DataMember]
-            public int[] kids { get; set; }
-            #pragma warning restore CA1819
-            [DataMember]
-            public string url { get; set; }
-            [DataMember]
-            public uint score { get; set; }
+        [DataMember]
+        public int poll { get; set; }
+#pragma warning disable CA1819
+        [DataMember]
+        public int[] kids { get; set; }
+#pragma warning restore CA1819
+        [DataMember]
+        public string url { get; set; }
+        [DataMember]
+        public uint score { get; set; }
 
-            [DataMember]
-            public string title { get; set; }
-            #pragma warning disable CA1819
-            [DataMember]
-            public uint[] parts { get; set; }
-               #pragma warning restore CA1819
+        [DataMember]
+        public string title { get; set; }
+#pragma warning disable CA1819
+        [DataMember]
+        public uint[] parts { get; set; }
+#pragma warning restore CA1819
 
-            [DataMember]
-            public uint descendants { get; set; }
-            #pragma warning restore IDE1006
+        [DataMember]
+        public uint descendants { get; set; }
+#pragma warning restore IDE1006
         #endregion
 
         public DateTimeOffset UnTime => DateTimeOffset.FromUnixTimeSeconds(time);
-        
+
         public int ItemId => id;
         public bool HasLink => true; //url != null; TODO clean up
         public string Link => url ?? $"{hackerComments}{id.ToString(CultureInfo.InvariantCulture)}";
@@ -94,7 +94,7 @@ namespace NetNewsTicker.Services
                 return false;
             }
             return Equals(objAsItem);
-        }        
+        }
 
         public override int GetHashCode()
         {

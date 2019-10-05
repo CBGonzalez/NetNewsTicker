@@ -15,15 +15,15 @@ namespace NetNewsTicker.ViewModels
     public class TickerViewModel : BaseViewModel
     {
         #region private stuff
-        
+
         private const int defRefreshDelayMs = 6;
         private const double buttonWidth = 250.0;
-        
+
         private readonly int refreshDelay = defRefreshDelayMs;
         private readonly Brush oldItemColor = Brushes.LightBlue, newItemColor = Brushes.LightGreen, visitedColor = Brushes.LightYellow;
         private Button infoButton;
         private readonly Typeface buttonTypeFace;
-        
+
         private double animationDurationMs; //TODO implement
         private double animationStep = 1.0; // used to accelerate / slow down animation spee
         private bool animateOn = true; // toggles animation on / off
@@ -31,7 +31,7 @@ namespace NetNewsTicker.ViewModels
         private readonly double optWindowWidth = 280;
         private readonly double optWindowHeight = 210;
         private const double defaultRefreshMin = 5.0;
-        private const int numberOfHeadlinesToDisplay = 25;
+        private const int defaultNumberOfHeadlinesToDisplay = 20;
         private Dictionary<int, List<string>> allServicesPages;
         #endregion
 
@@ -39,7 +39,7 @@ namespace NetNewsTicker.ViewModels
         private ObservableCollection<DropDownCategory> categoriesList;
         private ObservableCollection<DropDownCategory> servicesList;
         private Visibility showOptionsWindow, showPauseButton, showResumeButton, showInfoButton = Visibility.Visible, showItemButtons = Visibility.Hidden, showSecDisplayRadioButton, isRefreshingNews = Visibility.Hidden;
-        private bool usePrimaryDisplay, primaryIsCurrent, useTopTicker, topIsCurrent;        
+        private bool usePrimaryDisplay, primaryIsCurrent, useTopTicker, topIsCurrent;
         private bool isTopMost;
         private double left = 0, top = 0, width = 0; //positions relative to desktop
         //options window
@@ -51,7 +51,7 @@ namespace NetNewsTicker.ViewModels
         private ObservableCollection<string> headlines;
         private ObservableCollection<(string, string, string)> urls;
         private ObservableCollection<Brush> itemColors;
-        private double displayWidth;        
+        private double displayWidth;
         private bool canPause = true;
         private bool isDoingRefresh;
         private List<IContentItem> refreshedItems;
@@ -74,7 +74,7 @@ namespace NetNewsTicker.ViewModels
         public ICommand ButtonSlowerCommand { get; set; }
         public ICommand OptionsSaveCommand { get; set; }
         public ICommand OptionsCancelCommand { get; set; }
-        public ICommand OptionsDefaultsCommand { get; set; }        
+        public ICommand OptionsDefaultsCommand { get; set; }
         public ObservableCollection<DropDownCategory> CategoriesList => categoriesList;
         public ObservableCollection<DropDownCategory> ServicesList => servicesList;
         public bool CanExecuteOptionsWindow => showOptionsWindow == Visibility.Hidden;
@@ -84,22 +84,22 @@ namespace NetNewsTicker.ViewModels
         #endregion
 
         public TickerViewModel() : base()
-        {            
+        {
             // Get monitor info
             primScreenWidth = SystemParameters.PrimaryScreenWidth;
             secScreenWidth = SystemParameters.VirtualScreenWidth - SystemParameters.PrimaryScreenWidth; // TODO handle more than 2 monitors?
             primScreenHeight = SystemParameters.WorkArea.Height;
             secScreenHeight = SystemParameters.VirtualScreenHeight;
-            taskBarHeight = SystemParameters.PrimaryScreenHeight - SystemParameters.WorkArea.Height;           
+            taskBarHeight = SystemParameters.PrimaryScreenHeight - SystemParameters.WorkArea.Height;
 
             // Set defaults
             primaryIsCurrent = true;
             topIsCurrent = true;
-            isTopMost = true;            
+            isTopMost = true;
             UsePrimaryDisplay = true;
             primaryIsCurrent = true;
             UseTopTicker = true;
-            ShowSecDisplayRadioButton = secScreenWidth > 0 ? Visibility.Visible : Visibility.Hidden;
+            ShowSecDisplayRadioButton = secScreenWidth > 0 ? Visibility.Visible : Visibility.Hidden; // works for one gpu and 2 monitors
             ShowPauseButton = Visibility.Hidden;
             ShowResumeButton = Visibility.Hidden;
             ShowOptionsWindow = Visibility.Hidden;
@@ -107,43 +107,43 @@ namespace NetNewsTicker.ViewModels
             isDoingRefresh = false;
             selectedCategoryIndex = currentCategoryIndex = 0;
             selectedServiceIndex = currentServiceIndex = 0;
-            
+
             refreshIntervalMin = defaultRefreshMin;
             currentRefreshMin = refreshIntervalMin;
 
-            SetupWindows(UsePrimaryDisplay);            
+            SetupWindows(UsePrimaryDisplay);
             InitializeBindingCommands();
             InitializeItemsHandler();
-            CreateInitialItems();            
+            CreateInitialItems();
         }
-       
+
         private void SetupWindows(bool usePrimary)
         {
-            Width = usePrimary ? primScreenWidth - 2 : secScreenWidth - 2;            
+            Width = usePrimary ? primScreenWidth - 2 : secScreenWidth - 2;
             ViewWidth = Width - 4 * 16 - 4;
             double currentHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;
-            Top = topIsCurrent ? 1 : currentHeight - 32- 1 - taskBarHeight;
+            Top = topIsCurrent ? 1 : currentHeight - 32 - 1 - taskBarHeight;
             OptionsTop = topIsCurrent ? Top + 33 : Top - optWindowHeight;
-            if(!topIsCurrent && !usePrimary)
+            if (!topIsCurrent && !usePrimary)
             {
                 OptionsTop = optionsTop - taskBarHeight;
-            }            
+            }
             if (usePrimary)
             {
                 Left = 1;
                 OptionsLeft = Width - optWindowWidth;
-            } 
+            }
             else
             {
                 Left = primScreenWidth + 1;
                 OptionsLeft = Left + Width - optWindowWidth;
             }
-            
+
         }
 
         private void MoveWindowUpDown(bool toUp)
         {
-            double currHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;            
+            double currHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;
             if (toUp)
             {
                 Top = 1;
@@ -156,7 +156,7 @@ namespace NetNewsTicker.ViewModels
                 Top = usePrimaryDisplay ? top : top - taskBarHeight;
                 OptionsTop = Top - optWindowHeight;
                 IsTopmost = false;
-            }                        
+            }
         }
 
         private void InitializeBindingCommands()
@@ -168,7 +168,7 @@ namespace NetNewsTicker.ViewModels
             ButtonSlowerCommand = new RelayCommand(param => SlowerButtonClick());
             ButtonFasterCommand = new RelayCommand(param => FasterButtonClick());
             OptionsCancelCommand = new RelayCommand(param => CancelOptionsClick(), param => true);
-            OptionsSaveCommand = new RelayCommand(param => SaveOptionsClick(), param => true);                        
+            OptionsSaveCommand = new RelayCommand(param => SaveOptionsClick(), param => true);
         }
 
         private void InitializeItemsHandler()
@@ -186,9 +186,9 @@ namespace NetNewsTicker.ViewModels
                     aCat = new DropDownCategory(item.Item1, item.Item2);
                     ServicesList.Add(aCat);
                 }
-                PopulateCategories(0);                
+                PopulateCategories(0);
                 SelectedService = servicesList[0];
-            }            
+            }
             contentHandler.ItemsRefreshCompletedHandler += ContentHandler_ItemsRefreshCompletedHandler;
             contentHandler.ItemsRefreshStartedHandler += ContentHandler_ItemsRefreshStartedHandler;
             refreshedItems = contentHandler.NewContent;
@@ -196,13 +196,13 @@ namespace NetNewsTicker.ViewModels
 
         // Added to allow correct pages to display immediately after user selects new service
         private void PopulateCategories(int forWhichService)
-        {            
+        {
             DropDownCategory aCat;
             int counter = 0;
             if (allServicesPages.TryGetValue(forWhichService, out List<string> pagesList))
-            {                
+            {
                 categoriesList.Clear();
-                foreach(string pageName in pagesList)
+                foreach (string pageName in pagesList)
                 {
                     aCat = new DropDownCategory(counter, pageName);
                     CategoriesList.Add(aCat);
@@ -211,19 +211,19 @@ namespace NetNewsTicker.ViewModels
                 SelectedCategory = categoriesList[0];
             }
         }
-        
+
         private async void CreateInitialItems()
-        {            
+        {
             newsButtons = new ObservableCollection<Button>();
             positions = new ObservableCollection<double>();
             headlines = new ObservableCollection<string>();
             itemColors = new ObservableCollection<Brush>();
             urls = new ObservableCollection<(string, string, string)>();
 
-            infoButton = new Button() { Content = "...", Width = buttonWidth, Height = 30, Background = Brushes.LightGreen, Name = "B0", FontSize=16, FontWeight = FontWeights.Bold};
+            infoButton = new Button() { Content = "...", Width = buttonWidth, Height = 30, Background = Brushes.LightGreen, Name = "B0", FontSize = 16, FontWeight = FontWeights.Bold };
             itemColors.Add(Brushes.LightGreen);
             headlines.Add("Fetching items...");
-            positions.Add(displayWidth - buttonWidth);            
+            positions.Add(displayWidth - buttonWidth);
             urls.Add((string.Empty, string.Empty, string.Empty));
 
             var binding = new Binding($"Positions[{0}]") { Mode = BindingMode.OneWay }; ;
@@ -232,20 +232,20 @@ namespace NetNewsTicker.ViewModels
             infoButton.SetBinding(Button.VisibilityProperty, binding);
             NewsButtons.Add(infoButton); //Special button at position 0
 
-            binding = new Binding("ShowItemButtons") { Mode = BindingMode.OneWay };            
+            binding = new Binding("ShowItemButtons") { Mode = BindingMode.OneWay };
 
-            Binding posBinding, contentBinding, toolTipBinding, backgroundBinding;            
+            Binding posBinding, contentBinding, toolTipBinding, backgroundBinding;
             Button but;
             //prepare fixed number of buttons
             //TODO make number of headlines configurable
-            for(int i = 1; i < numberOfHeadlinesToDisplay + 1; i++)
+            for (int i = 1; i < defaultNumberOfHeadlinesToDisplay + 1; i++)
             {
                 positions.Add(displayWidth + i * buttonWidth + 2);
                 headlines.Add(string.Empty);
                 itemColors.Add(oldItemColor);
                 urls.Add((string.Empty, string.Empty, string.Empty));
 
-                but = new Button() { Width = buttonWidth, Height = 30 , Name = $"B{i}"};
+                but = new Button() { Width = buttonWidth, Height = 30, Name = $"B{i}" };
 
                 posBinding = new Binding($"Positions[{i}]") { Mode = BindingMode.OneWay };
                 but.SetBinding(Canvas.LeftProperty, posBinding);
@@ -254,10 +254,10 @@ namespace NetNewsTicker.ViewModels
                 contentBinding = new Binding($"Headlines[{i}]") { Mode = BindingMode.OneWay };
                 but.SetBinding(Button.ContentProperty, contentBinding);
 
-                toolTipBinding = new Binding($"Urls[{i}]");                
+                toolTipBinding = new Binding($"Urls[{i}]");
                 but.SetBinding(Button.ToolTipProperty, toolTipBinding);
 
-                backgroundBinding = new Binding($"ItemColors[{i}]") { Mode = BindingMode.Default};
+                backgroundBinding = new Binding($"ItemColors[{i}]") { Mode = BindingMode.Default };
                 but.SetBinding(Button.BackgroundProperty, backgroundBinding);
 
                 but.Click += But_Click;
@@ -265,7 +265,7 @@ namespace NetNewsTicker.ViewModels
 
                 NewsButtons.Add(but);
             }
-            
+
             _ = await Task.Run(() => DoAnimation()).ConfigureAwait(false); //Animation runs on its own thread
         }
 
@@ -284,7 +284,7 @@ namespace NetNewsTicker.ViewModels
         private async Task<bool> DoAnimation()
         {
             while (true)
-            {                
+            {
                 //long begAnimTicks;
                 //double ticksPerMs = Stopwatch.Frequency / 1000.0;
                 //int counter = 0;
@@ -294,13 +294,13 @@ namespace NetNewsTicker.ViewModels
                     //begAnimTicks = Stopwatch.GetTimestamp();
                     currStep = animationStep; //to avoid changes during the cycle
                     await Task.Delay(refreshDelay).ConfigureAwait(false);
-                    
+
                     double pos;
                     int tail;
                     for (int i = 0; i < Positions.Count; i++)
                     {
                         pos = Positions[i] - currStep;
-                        tail = i != 0 ? i - 1 : Positions.Count -1; // First item goes behind last, others behind previous
+                        tail = i != 0 ? i - 1 : Positions.Count - 1; // First item goes behind last, others behind previous
                         pos = pos + buttonWidth >= 0 ? pos : Positions[tail] + buttonWidth + 2;
                         Positions[i] = pos;
                     }
@@ -324,7 +324,7 @@ namespace NetNewsTicker.ViewModels
 
         // The event signalling that a refresh cycle completed
         private void ContentHandler_ItemsRefreshCompletedHandler(object sender, RefreshCompletedEventArgs e)
-        {                                           
+        {
             CanPause = true;
             if (!isDoingRefresh)
             {
@@ -343,7 +343,7 @@ namespace NetNewsTicker.ViewModels
             int newCount = refreshedItems.Count;
             if (newCount == 0)
             {
-                for(int i = 1; i < itemColors.Count; i++)
+                for (int i = 1; i < itemColors.Count; i++)
                 {
                     ItemColors[i] = ItemColors[i] == visitedColor ? visitedColor : oldItemColor;
                 }
@@ -351,27 +351,27 @@ namespace NetNewsTicker.ViewModels
                 return;
             }
 
-            newCount = newCount <= numberOfHeadlinesToDisplay ? newCount : numberOfHeadlinesToDisplay; //TODO make this configurable
-            
+            newCount = newCount <= defaultNumberOfHeadlinesToDisplay ? newCount : defaultNumberOfHeadlinesToDisplay; //TODO make this configurable
+
             // Replace the first newCount items with fresh content, move the others down            
-            int ceiling = headlines.Count-1;
-            if (newCount != numberOfHeadlinesToDisplay)
+            int ceiling = headlines.Count - 1;
+            if (newCount != defaultNumberOfHeadlinesToDisplay)
             {
-                for (int i = ceiling; i > newCount; i--)               
+                for (int i = ceiling; i > newCount; i--)
                 {
                     Headlines[i] = Headlines[i - newCount];
                     Urls[i] = Urls[i - newCount];
-                    ItemColors[i] = ItemColors[i - newCount ] == visitedColor ? visitedColor : oldItemColor;
+                    ItemColors[i] = ItemColors[i - newCount] == visitedColor ? visitedColor : oldItemColor;
                 }
             }
-             // Add the new items to the front
+            // Add the new items to the front
             for (int i = 1; i <= newCount; i++)
             {
-                Headlines[i] = FitString(refreshedItems[i - 1].ItemHeadline, buttonWidth);                
-                Urls[i] = (refreshedItems[i-1].HasSummary ? refreshedItems[i - 1].ItemSummary : refreshedItems[i - 1].ItemHeadline, refreshedItems[i - 1].Link, refreshedItems[i - 1].SecondaryLink);
-                ItemColors[i] = newItemColor;                    
+                Headlines[i] = FitString(refreshedItems[i - 1].ItemHeadline, buttonWidth);
+                Urls[i] = (refreshedItems[i - 1].HasSummary ? refreshedItems[i - 1].ItemSummary : refreshedItems[i - 1].ItemHeadline, refreshedItems[i - 1].Link, refreshedItems[i - 1].SecondaryLink);
+                ItemColors[i] = newItemColor;
             }
-            isDoingRefresh = false;                       
+            isDoingRefresh = false;
         }
 
         // Cut off too long headlines
@@ -379,12 +379,12 @@ namespace NetNewsTicker.ViewModels
         {
             string resString = s;
             var fs = new FormattedText(s, System.Globalization.CultureInfo.CurrentCulture, FlowDirection.LeftToRight, buttonTypeFace, 12, Brushes.Black, 1.0);
-            if(fs.Width > width)
+            if (fs.Width > width)
             {
                 double ratio = width / fs.Width;
                 int newWidth = (int)(ratio * s.Length) - 8;
                 resString = $"{resString.Substring(0, newWidth)} ...";
-            }                  
+            }
             return resString;
 
         }
@@ -399,7 +399,7 @@ namespace NetNewsTicker.ViewModels
             {
                 itemColors[butIndex] = visitedColor;
             }
-            
+
             (_, _, string secondary) = ((string, string, string))but.ToolTip;
             if (secondary != string.Empty)
             {
@@ -476,12 +476,12 @@ namespace NetNewsTicker.ViewModels
         private void SaveOptionsClick()
         {
             ShowOptionsWindow = Visibility.Hidden;
-            if(refreshIntervalMin != currentRefreshMin)
+            if (refreshIntervalMin != currentRefreshMin)
             {
                 currentRefreshMin = refreshIntervalMin;
                 contentHandler.ChangeRefreshInterval((int)refreshIntervalMin * 60);
             }
-            if(selectedNews != SelectedService.Id)
+            if (selectedNews != SelectedService.Id)
             {
                 selectedNews = SelectedService.Id;
                 currentServiceIndex = selectedNews;
@@ -490,8 +490,8 @@ namespace NetNewsTicker.ViewModels
                 ResetPositions();
                 selectedPage = SelectedCategory.Id;
                 contentHandler.ChangeCurrentService(selectedNews, selectedPage, isLogEnabled);
-                LogCheckTooltip = contentHandler.LogPath;                
-                PopulateCategories(selectedNews);                
+                LogCheckTooltip = contentHandler.LogPath;
+                PopulateCategories(selectedNews);
                 refreshedItems = contentHandler.NewContent;
                 SelectedCategory = categoriesList[selectedPage];
                 SelectedCategoryIndex = selectedPage;
@@ -506,18 +506,18 @@ namespace NetNewsTicker.ViewModels
                 ResetPositions();
                 currentCategoryIndex = selectedPage;
             }
-            if(usePrimaryDisplay != primaryIsCurrent)
+            if (usePrimaryDisplay != primaryIsCurrent)
             {
                 primaryIsCurrent = usePrimaryDisplay;
                 SetupWindows(usePrimaryDisplay);
-                ResetPositions();                
+                ResetPositions();
             }
-            if(useTopTicker != topIsCurrent)
+            if (useTopTicker != topIsCurrent)
             {
                 topIsCurrent = useTopTicker;
-                MoveWindowUpDown(useTopTicker);                
+                MoveWindowUpDown(useTopTicker);
             }
-            if(isLogEnabled != currentLogging)
+            if (isLogEnabled != currentLogging)
             {
                 currentLogging = isLogEnabled;
                 ModifyLogging(isLogEnabled);
@@ -528,24 +528,24 @@ namespace NetNewsTicker.ViewModels
         private void CancelOptionsClick()
         {
             ShowOptionsWindow = Visibility.Hidden;
-            if(currentRefreshMin != refreshIntervalMin)
+            if (currentRefreshMin != refreshIntervalMin)
             {
                 NetworkRefresh = currentRefreshMin.ToString("N1", System.Globalization.CultureInfo.CurrentCulture);
             }
-            if(currentServiceIndex != selectedServiceIndex)
+            if (currentServiceIndex != selectedServiceIndex)
             {
                 SelectedServiceIndex = currentServiceIndex;
                 SelectedService = servicesList[currentServiceIndex];
             }
-            if(currentCategoryIndex != selectedCategoryIndex)
+            if (currentCategoryIndex != selectedCategoryIndex)
             {
                 SelectedCategoryIndex = currentCategoryIndex;
             }
-            if(primaryIsCurrent != usePrimaryDisplay)
+            if (primaryIsCurrent != usePrimaryDisplay)
             {
                 UsePrimaryDisplay = primaryIsCurrent;
             }
-            if(topIsCurrent != useTopTicker)
+            if (topIsCurrent != useTopTicker)
             {
                 UseTopTicker = topIsCurrent;
             }
@@ -570,7 +570,7 @@ namespace NetNewsTicker.ViewModels
             get => optionsTop;
             set
             {
-                if(optionsTop != value)
+                if (optionsTop != value)
                 {
                     optionsTop = value;
                     NotifyPropertyChanged();
@@ -609,7 +609,7 @@ namespace NetNewsTicker.ViewModels
             get => selectedServiceIndex;
             set
             {
-                if(selectedServiceIndex != value)
+                if (selectedServiceIndex != value)
                 {
                     selectedServiceIndex = value;
                     NotifyPropertyChanged();
@@ -625,7 +625,7 @@ namespace NetNewsTicker.ViewModels
             {
                 selectedCategoryIndex = value;
                 NotifyPropertyChanged();
-                
+
             }
         }
 
@@ -647,10 +647,10 @@ namespace NetNewsTicker.ViewModels
             get => usePrimaryDisplay;
             set
             {
-                if(usePrimaryDisplay != value)
+                if (usePrimaryDisplay != value)
                 {
                     usePrimaryDisplay = value;
-                    NotifyPropertyChanged();                    
+                    NotifyPropertyChanged();
                 }
             }
         }
@@ -673,7 +673,7 @@ namespace NetNewsTicker.ViewModels
             get => isTopMost;
             set
             {
-                if(isTopMost != value)
+                if (isTopMost != value)
                 {
                     isTopMost = value;
                     NotifyPropertyChanged();
@@ -686,7 +686,7 @@ namespace NetNewsTicker.ViewModels
             get => isLogEnabled;
             set
             {
-                if(isLogEnabled != value)
+                if (isLogEnabled != value)
                 {
                     isLogEnabled = value;
                     NotifyPropertyChanged();
@@ -701,7 +701,7 @@ namespace NetNewsTicker.ViewModels
             get => logLocation;
             set
             {
-                if(logLocation != value)
+                if (logLocation != value)
                 {
                     logLocation = value;
                     NotifyPropertyChanged();
@@ -727,7 +727,7 @@ namespace NetNewsTicker.ViewModels
             get => isRefreshingNews;
             set
             {
-                if(isRefreshingNews != value)
+                if (isRefreshingNews != value)
                 {
                     isRefreshingNews = value;
                     NotifyPropertyChanged();
@@ -830,14 +830,14 @@ namespace NetNewsTicker.ViewModels
         public ObservableCollection<double> Positions => positions;
 
         public ObservableCollection<Button> NewsButtons => newsButtons;
-        
+
 
         public double Left
         {
             get => left;
             set
             {
-                if(left != value)
+                if (left != value)
                 {
                     left = value;
                     NotifyPropertyChanged();
