@@ -1,6 +1,6 @@
 ﻿
 namespace NetNewsTicker.ViewModels
-{   
+{
     public class DropDownCategory : System.IEquatable<DropDownCategory>
     {
         public string Name { get; }
@@ -23,7 +23,7 @@ namespace NetNewsTicker.ViewModels
 
         public override bool Equals(object obj)
         {
-            if(obj == null)
+            if (obj == null)
             {
                 return false;
             }
@@ -31,11 +31,11 @@ namespace NetNewsTicker.ViewModels
             return obj is DropDownCategory && Equals((DropDownCategory)obj);
         }
 
-        
+
         public override int GetHashCode()
         {
             return Id;
-        }        
+        }
     }
-    
+
 }

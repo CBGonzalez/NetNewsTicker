@@ -15,6 +15,6 @@ namespace NetNewsTicker.Model
         string SecondaryLink { get; }
         bool HasSubItems { get; }
         Memory<int> SubItems { get; }
-        DateTime ItemCreationDate { get; }       
+        DateTime ItemCreationDate { get; }
     }
 }

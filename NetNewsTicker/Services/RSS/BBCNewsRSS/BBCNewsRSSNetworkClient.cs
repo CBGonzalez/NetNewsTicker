@@ -4,15 +4,15 @@ using System.ServiceModel.Syndication;
 namespace NetNewsTicker.Services.RSS.BBCNewsRSS
 {
     internal class BBCNewsRSSNetworkClient : RSSNetworkClient
-    {        
+    {
         public BBCNewsRSSNetworkClient(bool enableLogging) : base(enableLogging)
         {
             newsServerBase = new Uri("https://feeds.bbci.co.uk");
             rssTail = "/rss.xml";
             client.BaseAddress = newsServerBase;
-            logFileName = "BBCNewsTicker-RSS.txt";            
+            logFileName = "BBCNewsTicker-RSS.txt";
             InitializeNetworClient(isLoggingEnabled);
-        }        
+        }
 
         internal override void ParseContent(SyndicationFeed feed)
         {

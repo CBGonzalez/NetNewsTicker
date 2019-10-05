@@ -16,14 +16,14 @@ namespace NetNewsTicker.ViewModels
         #endregion
 
         #region Public properties
-        public event PropertyChangedEventHandler PropertyChanged;        
+        public event PropertyChangedEventHandler PropertyChanged;
         #endregion
-             
+
         public BaseViewModel()
         {
-            
+
         }
-        
+
 
         internal void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
         {
@@ -31,14 +31,14 @@ namespace NetNewsTicker.ViewModels
         }
 
         #region IDisposable Support
-       
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
                 if (disposing)
                 {
-                    if(contentHandler != null)
+                    if (contentHandler != null)
                     {
                         contentHandler.Dispose();
                     }
@@ -49,9 +49,9 @@ namespace NetNewsTicker.ViewModels
 
         public void Dispose()
         {
-            
+
             Dispose(true);
-            GC.SuppressFinalize(this);           
+            GC.SuppressFinalize(this);
         }
         #endregion
     }

@@ -11,7 +11,7 @@ namespace NetNewsTicker.Services.RSS
         {
             //nwClient = new RSSNetworkClient();            
             newItems = new List<IContentItem>();
-            maxNewsPageItem = (int)NewsPage.Front;            
+            maxNewsPageItem = (int)NewsPage.Front;
         }
 
         public override async Task<bool> RefreshItemsAsync()
@@ -56,6 +56,6 @@ namespace NetNewsTicker.Services.RSS
             isRefreshing = false;
             return success;
         }
-        
+
     }
 }

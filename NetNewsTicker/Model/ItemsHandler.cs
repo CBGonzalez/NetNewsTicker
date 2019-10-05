@@ -6,17 +6,17 @@ using NetNewsTicker.Services;
 namespace NetNewsTicker.Model
 {
     class ItemsHandler : IDisposable
-    {                
+    {
         private bool disposedValue = false; // To detect redundant calls of Dispose()        
         private int currentCategory = 0;
-        private  List<IContentItem> newContent;        
+        private List<IContentItem> newContent;
         private List<IContentItem> allContent;
         private List<(int, string)> allCategories;
         private readonly List<(int, string)> allServices;
         private EventHandler<RefreshCompletedEventArgs> itemsRefreshCompleted, itemsRefreshStarted;
         private bool hasNewItems;
         private ITickerCommunicationService tickerService;
-        private int refreshSeconds;        
+        private int refreshSeconds;
         private int currentService;
         private readonly int maxService;
         private bool logEnabled;
@@ -41,7 +41,7 @@ namespace NetNewsTicker.Model
             }
             remove
             {
-                itemsRefreshStarted -= value;                
+                itemsRefreshStarted -= value;
             }
         }
 
@@ -74,19 +74,19 @@ namespace NetNewsTicker.Model
                 allServices.Add((s.Key, s.Value));
             }
             currentService = 0;
-            maxService = allServices.Count - 1;            
+            maxService = allServices.Count - 1;
             tickerService = ServiceSelector.CreateService(currentService, logEnabled);
             logPath = tickerService.LogPath;
             allContent = tickerService.GetAllItemsList();
-            newContent = tickerService.GetNewItemsList();            
-            if(tickerService.HasDifferentCategories)
+            newContent = tickerService.GetNewItemsList();
+            if (tickerService.HasDifferentCategories)
             {
                 allCategories = tickerService.ViewIdsAndDescriptions;
             }
             tickerService.RefreshCompletedHandler += TickerService_RefreshCompletedHandler;
             tickerService.RefreshStartedHandler += TickerService_RefreshStartedHandler;
             refreshSeconds = refreshIntervalSeconds;
-            tickerService.StartRefreshing(refreshSeconds, currentCategory);               
+            tickerService.StartRefreshing(refreshSeconds, currentCategory);
         }
 
         private void TickerService_RefreshStartedHandler(object sender, RefreshCompletedEventArgs e)
@@ -95,8 +95,8 @@ namespace NetNewsTicker.Model
         }
 
         private void TickerService_RefreshCompletedHandler(object sender, RefreshCompletedEventArgs e)
-        {            
-            if(e.HasNewItems)
+        {
+            if (e.HasNewItems)
             {
                 hasNewItems = true;
                 OnRefreshCompleted(e);
@@ -120,14 +120,14 @@ namespace NetNewsTicker.Model
         }
 
         public bool RefreshItems()
-        {            
+        {
             allContent = tickerService.GetAllItemsList();
             return true;
         }
 
         public void PauseRefresh()
         {
-            tickerService.PauseRefreshing();          
+            tickerService.PauseRefreshing();
         }
 
         public void ResumeRefreshing()
@@ -137,7 +137,7 @@ namespace NetNewsTicker.Model
 
         public void ControlLogging(bool doLoggings)
         {
-            if(doLoggings != logEnabled)
+            if (doLoggings != logEnabled)
             {
                 logEnabled = doLoggings;
                 tickerService.ChangeLogging(logEnabled);
@@ -147,13 +147,13 @@ namespace NetNewsTicker.Model
 
         public void Close()
         {
-            tickerService.StopRefreshing();            
+            tickerService.StopRefreshing();
             Dispose();
         }
-        
+
         public void ChangeCurrentCategory(int newPage)
-        {            
-            if(newPage != currentCategory)
+        {
+            if (newPage != currentCategory)
             {
                 currentCategory = newPage;
                 tickerService.ChangeContentCategory(newPage);
@@ -163,16 +163,16 @@ namespace NetNewsTicker.Model
 
         public void ChangeCurrentService(int newService, int whichPage = 0, bool enableLogging = false)
         {
-            if(newService <= maxService && currentService != newService)
+            if (newService <= maxService && currentService != newService)
             {
                 logEnabled = enableLogging;
                 currentCategory = whichPage;
                 hasNewItems = false;
-                currentService = newService;                
+                currentService = newService;
                 tickerService = ServiceSelector.CreateService(newService, logEnabled);
                 logPath = tickerService.LogPath;
                 allContent = tickerService.GetAllItemsList();
-                newContent = tickerService.GetNewItemsList();                
+                newContent = tickerService.GetNewItemsList();
                 if (tickerService.HasDifferentCategories)
                 {
                     allCategories = tickerService.ViewIdsAndDescriptions;
@@ -180,9 +180,9 @@ namespace NetNewsTicker.Model
                 //tickerService.ChangeContentCategory(0);
                 tickerService.ChangeContentCategory(currentCategory);
                 tickerService.RefreshCompletedHandler += TickerService_RefreshCompletedHandler;
-                tickerService.RefreshStartedHandler += TickerService_RefreshStartedHandler;                
-                tickerService.StartRefreshing(refreshSeconds, currentCategory);                
-            }            
+                tickerService.RefreshStartedHandler += TickerService_RefreshStartedHandler;
+                tickerService.StartRefreshing(refreshSeconds, currentCategory);
+            }
         }
 
         public void ChangeRefreshInterval(int newIntervalSeconds)
@@ -195,7 +195,7 @@ namespace NetNewsTicker.Model
         }
 
         #region IDisposable Support
-        
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
@@ -211,7 +211,7 @@ namespace NetNewsTicker.Model
         }
 
         public void Dispose()
-        {            
+        {
             Dispose(true);
             GC.SuppressFinalize(this);
         }

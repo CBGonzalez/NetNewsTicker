@@ -15,7 +15,7 @@ namespace NetNewsTicker.Services
         static ServiceSelector()
         {
             servicesItems = new Dictionary<int, List<string>>();
-            foreach(KeyValuePair<int, string> kvp in serviceList)
+            foreach (KeyValuePair<int, string> kvp in serviceList)
             {
                 ITickerCommunicationService dummyService = CreateService(kvp.Key, false);
                 var items = new List<string>();
@@ -43,7 +43,7 @@ namespace NetNewsTicker.Services
                 service.Dispose();
                 service = null;
             }
-            switch(whichService)
+            switch (whichService)
             {
                 case 0:
                     service = new YComNewsService(useLogging);

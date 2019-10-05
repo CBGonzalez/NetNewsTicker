@@ -10,12 +10,14 @@ namespace NetNewsTicker.Services
 
         string LogPath { get; }
 
+        int MaximumItems { get; }
+
         bool HasDifferentCategories { get; }
 
         /// <summary>
         /// A list of available categories to display
         /// </summary>
-        List<(int, string)> ViewIdsAndDescriptions { get;}
+        List<(int, string)> ViewIdsAndDescriptions { get; }
 
         /// <summary>
         /// If true, signals that the service is amidst a refresh cycle

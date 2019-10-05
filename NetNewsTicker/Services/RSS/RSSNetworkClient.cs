@@ -23,7 +23,7 @@ namespace NetNewsTicker.Services.RSS
         }
 
         public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
-        {            
+        {
             SyndicationFeed rssFeed;
             bool success = false;
             string error = string.Empty;
@@ -38,7 +38,7 @@ namespace NetNewsTicker.Services.RSS
                 }
             }
             try
-            {                
+            {
                 response = await client.GetAsync($"{itemsURL}{rssTail}", cancel).ConfigureAwait(false);
                 if (!response.IsSuccessStatusCode)
                 {
@@ -72,12 +72,12 @@ namespace NetNewsTicker.Services.RSS
             }
             catch (HttpRequestException e)
             {
-                Logger.Log(e.ToString(), Logger.Level.Error);                
+                Logger.Log(e.ToString(), Logger.Level.Error);
                 error += e.ToString();
             }
             catch (TaskCanceledException te)
             {
-                Logger.Log(te.ToString(), Logger.Level.Information);                
+                Logger.Log(te.ToString(), Logger.Level.Information);
                 error += te.ToString();
             }
             finally

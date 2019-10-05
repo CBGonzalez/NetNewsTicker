@@ -10,6 +10,7 @@ namespace NetNewsTicker.Services
     {
         protected enum NewsPage { Front = 0 };
         private protected int maxNewsPageItem = 0;
+        private protected int maximumItems = 20; // most RSS services will return no more than 20 items; YCombinator will return up to 500 ...
         private protected List<(int, string)> viewIdsAndDescriptions;
         private protected bool disposedValue = false; // To detect redundant calls to Dispose()
         private protected bool doRefreshing;
@@ -34,6 +35,7 @@ namespace NetNewsTicker.Services
         private protected string logPath = string.Empty;
         private protected bool forceRefresh = false;
 
+        public int MaximumItems => maximumItems;
         public string LastError => errorMessage;
         public bool IsRefreshing => isRefreshing;
 
@@ -43,7 +45,7 @@ namespace NetNewsTicker.Services
         {
             currentItems = new List<IContentItem>(itemCount);
             newItems = new List<IContentItem>();
-            currentIds = new List<int>();            
+            currentIds = new List<int>();
             for (int i = 0; i < itemCount; i++)
             {
                 currentIds.Add(0);
@@ -56,13 +58,13 @@ namespace NetNewsTicker.Services
 
         public TickerCommunicationServiceBase(bool doLogging) : this()
         {
-            enableLogging = doLogging;            
+            enableLogging = doLogging;
         }
 
         public bool HasDifferentCategories => hasDifferentCategories;
 
         public List<(int, string)> ViewIdsAndDescriptions => viewIdsAndDescriptions;
-        
+
         public event EventHandler<RefreshCompletedEventArgs> RefreshStartedHandler
         {
             add
@@ -202,8 +204,8 @@ namespace NetNewsTicker.Services
             }
         }
 
-        internal abstract void SetCorrectUrl(int page);        
-       
+        internal abstract void SetCorrectUrl(int page);
+
         private protected virtual async void TimerCB(Object stateInfo)
         {
             bool stillRunning = Interlocked.CompareExchange(ref isTimerCBRunning, 1, 0) != 0;
@@ -222,8 +224,8 @@ namespace NetNewsTicker.Services
         }
 
         public abstract Task<bool> RefreshItemsAsync();
-        
-        
+
+
         #region IDisposable Support
 
         protected virtual void Dispose(bool disposing)
@@ -231,7 +233,7 @@ namespace NetNewsTicker.Services
             if (!disposedValue)
             {
                 if (disposing)
-                {                                        
+                {
                     if (timer != null)
                     {
                         timer.Dispose();
@@ -248,14 +250,14 @@ namespace NetNewsTicker.Services
                         nwClient.Dispose();
                         nwClient = null;
                     }
-                }                
+                }
                 disposedValue = true;
             }
-        }        
+        }
 
         // This code added to correctly implement the disposable pattern.
         public void Dispose()
-        {            
+        {
             Dispose(true);
             GC.SuppressFinalize(this);
         }

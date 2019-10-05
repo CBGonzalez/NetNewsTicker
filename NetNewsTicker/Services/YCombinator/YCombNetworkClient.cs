@@ -13,24 +13,24 @@ namespace NetNewsTicker.Services
 {
     public class YCombNetworkClient : NetworkClientBase
     {
-        
+
         private readonly DataContractJsonSerializer jasonSer;
         private int currentMaxItem = 0;
         private bool mustRefresh = false;
-       
+
         public YCombNetworkClient() : base()
-        {                            
-            jasonSer = new DataContractJsonSerializer((new YCombItem()).GetType());  
+        {
+            jasonSer = new DataContractJsonSerializer((new YCombItem()).GetType());
             newsServerBase = new Uri("https://hacker-news.firebaseio.com/v0/");
-            logFileName = "NewsTickerLog.txt";            
+            logFileName = "NewsTickerLog.txt";
         }
 
         public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
         {
             bool isOK;
-            string error;            
+            string error;
             mustRefresh = howManyItems <= 0;
-            if(mustRefresh)
+            if (mustRefresh)
             {
                 howManyItems = 50;
             }
@@ -38,21 +38,21 @@ namespace NetNewsTicker.Services
             (bool success, bool needsRefreshing, string errorMsg) = await GetMaxItemAsync(cancel);
             isOK = success;
             error = errorMsg;
-            if(isOK && needsRefreshing && !cancel.IsCancellationRequested)
+            if (isOK && needsRefreshing && !cancel.IsCancellationRequested)
             {
                 (bool fetchedOK, List<int> list, string errorMessage) = await FetchItemIdsForPageAsync(itemsURL, cancel);
                 isOK = fetchedOK;
                 error = errorMessage;
-                
-                if(isOK && list.Count > 0 && !cancel.IsCancellationRequested)
+
+                if (isOK && list.Count > 0 && !cancel.IsCancellationRequested)
                 {
                     int howManyToFetch = list.Count >= howManyItems ? howManyItems : list.Count;
                     fetchedItems = new List<IContentItem>(howManyToFetch);
-                    for(int i = 0; i < howManyToFetch; i++)
+                    for (int i = 0; i < howManyToFetch; i++)
                     {
                         (bool itemOK, YCombItem item, _) = await GetOneItemAsync(list[i], cancel);
                         isOK = itemOK;
-                        if(isOK)
+                        if (isOK)
                         {
                             if (item != null)
                             {
@@ -197,7 +197,7 @@ namespace NetNewsTicker.Services
             int position = 0, commaPosition = localContent.IndexOf(',');
             int counter = 0;
             while (commaPosition >= 0)
-            {                
+            {
                 ids.Add(int.Parse(new string(currentSlice.Slice(position, commaPosition).ToArray()), NumberStyles.Integer, CultureInfo.InvariantCulture));
                 position = commaPosition + 1;
                 currentSlice = currentSlice.Slice(position);

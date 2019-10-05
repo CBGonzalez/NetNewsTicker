@@ -28,7 +28,7 @@ namespace NetNewsTicker.Services.RSS
             if (item == null)
             {
                 throw new ArgumentNullException(nameof(item));
-            }            
+            }
             itemHeadline = item.Title.Text;
             if (item.Links.Count > 0)
             {
@@ -39,7 +39,7 @@ namespace NetNewsTicker.Services.RSS
             {
                 hasLink = false;
                 link = string.Empty;
-            }            
+            }
         }
 
         public bool Equals(IContentItem other)
