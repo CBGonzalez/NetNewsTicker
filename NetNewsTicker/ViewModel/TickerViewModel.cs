@@ -273,14 +273,16 @@ namespace NetNewsTicker.ViewModels
         {
             if (Positions != null)
             {
+                animateOn = false;
                 for (int i = 0; i < Positions.Count; i++)
                 {
-                    Positions[i] = displayWidth - buttonWidth + (i * buttonWidth) + 2;
+                    Positions[i] = displayWidth - (2 * buttonWidth) + (i * buttonWidth) + 2;
                 }
+                animateOn = true;
             }
         }
 
-        //The animation just updates the position values, bound to the button´s Canvas.Left property
+        // The animation just updates the position values, bound to the button´s Canvas.Left property
         private async Task<bool> DoAnimation()
         {
             while (true)
@@ -289,19 +291,26 @@ namespace NetNewsTicker.ViewModels
                 //double ticksPerMs = Stopwatch.Frequency / 1000.0;
                 //int counter = 0;
                 double currStep;
+                double pos;
+                int tail;
                 while (animateOn)
                 {
                     //begAnimTicks = Stopwatch.GetTimestamp();
                     currStep = animationStep; //to avoid changes during the cycle
                     await Task.Delay(refreshDelay).ConfigureAwait(false);
 
-                    double pos;
-                    int tail;
                     for (int i = 0; i < Positions.Count; i++)
                     {
                         pos = Positions[i] - currStep;
                         tail = i != 0 ? i - 1 : Positions.Count - 1; // First item goes behind last, others behind previous
-                        pos = pos + buttonWidth >= 0 ? pos : Positions[tail] + buttonWidth + 2;
+                        if (i == 0 && ShowInfoButton == Visibility.Visible)
+                        {
+                            pos = pos + buttonWidth >= 0 ? pos : displayWidth;
+                        }
+                        else
+                        {
+                            pos = pos + buttonWidth >= 0 ? pos : Positions[tail] + buttonWidth + 2;
+                        }
                         Positions[i] = pos;
                     }
                     //counter++;
@@ -328,6 +337,7 @@ namespace NetNewsTicker.ViewModels
             CanPause = true;
             if (!isDoingRefresh)
             {
+                ResetPositions();
                 RefreshDisplayList();
             }
             ShowPauseButton = Visibility.Visible;
@@ -401,7 +411,7 @@ namespace NetNewsTicker.ViewModels
             }
 
             (_, _, string secondary) = ((string, string, string))but.ToolTip;
-            if (secondary != string.Empty)
+            if (secondary.Length != 0)
             {
                 var p = Process.Start(secondary);
                 p.Dispose();

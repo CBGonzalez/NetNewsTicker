@@ -42,7 +42,7 @@ namespace NetNewsTicker.Services
             }
             try
             {
-                (bool isSucces, List<IContentItem> list, string error) = await yClient.FetchAllItemsAsync(whichPage, itemCount, cancelToken);
+                (bool isSucces, List<IContentItem> list, string error) = await yClient.FetchAllItemsAsync(whichPage, itemCount, cancelToken).ConfigureAwait(false);
                 isOK = isSucces;
                 itemCount = oldItemCount;
                 errorMessage = error;

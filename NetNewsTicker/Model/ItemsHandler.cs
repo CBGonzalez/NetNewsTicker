@@ -177,7 +177,6 @@ namespace NetNewsTicker.Model
                 {
                     allCategories = tickerService.ViewIdsAndDescriptions;
                 }
-                //tickerService.ChangeContentCategory(0);
                 tickerService.ChangeContentCategory(currentCategory);
                 tickerService.RefreshCompletedHandler += TickerService_RefreshCompletedHandler;
                 tickerService.RefreshStartedHandler += TickerService_RefreshStartedHandler;

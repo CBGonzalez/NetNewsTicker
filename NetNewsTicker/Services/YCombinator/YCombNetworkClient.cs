@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Runtime.Serialization.Json;
 using System.Threading;
@@ -20,7 +21,7 @@ namespace NetNewsTicker.Services
 
         public YCombNetworkClient() : base()
         {
-            jasonSer = new DataContractJsonSerializer((new YCombItem()).GetType());
+            jasonSer = new DataContractJsonSerializer(new YCombItem().GetType());
             newsServerBase = new Uri("https://hacker-news.firebaseio.com/v0/");
             logFileName = "NewsTickerLog.txt";
         }
@@ -35,12 +36,12 @@ namespace NetNewsTicker.Services
                 howManyItems = 50;
             }
             List<IContentItem> fetchedItems = null;
-            (bool success, bool needsRefreshing, string errorMsg) = await GetMaxItemAsync(cancel);
+            (bool success, bool needsRefreshing, string errorMsg) = await GetMaxItemAsync(cancel).ConfigureAwait(false);
             isOK = success;
             error = errorMsg;
             if (isOK && needsRefreshing && !cancel.IsCancellationRequested)
             {
-                (bool fetchedOK, List<int> list, string errorMessage) = await FetchItemIdsForPageAsync(itemsURL, cancel);
+                (bool fetchedOK, List<int> list, string errorMessage) = await FetchItemIdsForPageAsync(itemsURL, cancel).ConfigureAwait(false);
                 isOK = fetchedOK;
                 error = errorMessage;
 
@@ -50,7 +51,7 @@ namespace NetNewsTicker.Services
                     fetchedItems = new List<IContentItem>(howManyToFetch);
                     for (int i = 0; i < howManyToFetch; i++)
                     {
-                        (bool itemOK, YCombItem item, _) = await GetOneItemAsync(list[i], cancel);
+                        (bool itemOK, YCombItem item, _) = await GetOneItemAsync(list[i], cancel).ConfigureAwait(false);
                         isOK = itemOK;
                         if (isOK)
                         {
