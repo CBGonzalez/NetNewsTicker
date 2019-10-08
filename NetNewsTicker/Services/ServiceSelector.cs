@@ -15,6 +15,7 @@ namespace NetNewsTicker.Services
         static ServiceSelector()
         {
             servicesItems = new Dictionary<int, List<string>>();
+            // populate pages for all services so we can display in settings window
             foreach (KeyValuePair<int, string> kvp in serviceList)
             {
                 ITickerCommunicationService dummyService = CreateService(kvp.Key, false);
