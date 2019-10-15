@@ -894,7 +894,7 @@ namespace NetNewsTicker.ViewModels
                 }
                 else
                 {
-                    throw new ApplicationException(Properties.Resources.ErrorMustBeNumeric);
+                    throw new ApplicationException(Localization.Resources.ErrorMustBeNumeric);
 
                 }
             }
