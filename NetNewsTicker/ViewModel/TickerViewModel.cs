@@ -413,7 +413,10 @@ namespace NetNewsTicker.ViewModels
             (_, _, string secondary) = ((string, string, string))but.ToolTip;
             if (secondary.Length != 0)
             {
-                var p = Process.Start(secondary);
+                // var p = Process.Start(secondary);
+                // hack for net core
+                string cleanUrl = secondary.Replace("&", "^&");
+                var p = Process.Start(new ProcessStartInfo("cmd", $"/c start {cleanUrl}") { CreateNoWindow = true });
                 p.Dispose();
             }
             e.Handled = true;
@@ -894,7 +897,7 @@ namespace NetNewsTicker.ViewModels
                 }
                 else
                 {
-                    throw new ApplicationException(Properties.Resources.ErrorMustBeNumeric);
+                    throw new ApplicationException(Localization.Resources.ErrorMustBeNumeric);
 
                 }
             }

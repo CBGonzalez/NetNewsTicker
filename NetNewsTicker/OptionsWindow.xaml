@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         
         xmlns:local="clr-namespace:NetNewsTicker"
-        xmlns:localization="clr-namespace:NetNewsTicker.Properties"
+        xmlns:localization="clr-namespace:NetNewsTicker.Localization"
         WindowStartupLocation="Manual"
         Left="{Binding OptionsLeft, Mode=TwoWay}"
         Top="{Binding OptionsTop, Mode=TwoWay}"

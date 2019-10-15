@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+	<RootNamespace>NetNewsTicker</RootNamespace>
+    <AssemblyName>NetNewsTicker</AssemblyName>
+	<ApplicationIcon>ASPNETWeb_16x.ico</ApplicationIcon>
+	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>false</Deterministic>
+    <!-- uncomment to get a single-file publish
+    <RuntimeIdentifier>win10-x64</RuntimeIdentifier>
+    <PublishSingleFile>true</PublishSingleFile>
+    -->
+    <!-- uncomment above and here  to get a compact executable
+    <PublishTrimmed>true</PublishTrimmed>
+    -->
+    
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Images\ASPNETWebApplication_16x.png" />
+    <Resource Include="Images\ASPNETWeb_16x.ico" />
+    <Resource Include="Images\Close_Red_16x.ico" />
+    <Resource Include="Images\Dn16.png" />
+    <Resource Include="Images\EventRed_16x.png" />
+    <Resource Include="Images\Options_16X.ico" />
+    <Resource Include="Images\Pause_Red_LT_16x.png" />
+    <Resource Include="Images\Play_Green_LT_16x.png" />
+    <Resource Include="Images\Up16.png" />
+	<Resource Include="Images\CloseSolution_16x.png" />
+	<Resource Include="ASPNETWeb_16x.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="out\NetNewsTicker\**\*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.1.0-preview1.19504.10" />
+  </ItemGroup>
+</Project>
