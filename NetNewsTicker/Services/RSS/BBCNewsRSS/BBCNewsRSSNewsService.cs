@@ -22,42 +22,20 @@ namespace NetNewsTicker.Services.RSS.BBCNewsRSS
         internal override void SetCorrectUrl(int page)
         {
             var nPage = (NewsPage)page;
-            switch (nPage)
+            whichPage = nPage switch
             {
-                case NewsPage.FrontPage:
-                    whichPage = "/news";
-                    break;
-                case NewsPage.World:
-                    whichPage = "/news/world";
-                    break;
-                case NewsPage.Technology:
-                    whichPage = "/news/technology";
-                    break;
-                case NewsPage.Science_Environment:
-                    whichPage = "/news/science_and_environment";
-                    break;
-                case NewsPage.Europe:
-                    whichPage = "/news/world/europe";
-                    break;
-                case NewsPage.UK:
-                    whichPage = "/news/uk";
-                    break;
-                case NewsPage.US_Canada:
-                    whichPage = "/news/world/us_and_canada";
-                    break;
-                case NewsPage.Latin_America:
-                    whichPage = "/news/world/latin_america";
-                    break;
-                case NewsPage.Asia:
-                    whichPage = "/news/world/asia";
-                    break;
-                case NewsPage.Africa:
-                    whichPage = "/news/world/africa";
-                    break;
-                default:
-                    whichPage = "/news";
-                    break;
-            }
+                NewsPage.FrontPage => "/news",
+                NewsPage.World => "/news/world",
+                NewsPage.Technology => "/news/technology",
+                NewsPage.Science_Environment => "/news/science_and_environment",
+                NewsPage.Europe => "/news/world/europe",
+                NewsPage.UK => "/news/uk",
+                NewsPage.US_Canada => "/news/world/us_and_canada",
+                NewsPage.Latin_America => "/news/world/latin_america",
+                NewsPage.Asia => "/news/world/asia",
+                NewsPage.Africa => "/news/world/africa",
+                _ => "/news",
+            };
         }
     }
 }

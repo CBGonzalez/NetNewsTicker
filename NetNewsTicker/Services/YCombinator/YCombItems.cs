@@ -1,60 +1,44 @@
-﻿using System;
+﻿using NetNewsTicker.Model;
+using System;
 using System.Globalization;
-using System.Runtime.Serialization;
-using NetNewsTicker.Model;
 
 namespace NetNewsTicker.Services
 {
-    [DataContract]
+
     public class YCombItem : IContentItem
     {
         private const string hackerComments = "https://news.ycombinator.com/item?id=";
 
         #region JSON stuff
-#pragma warning disable IDE1006
-        [DataMember]
+#pragma warning disable IDE1006        
         public int id { get; set; }
 
-        [DataMember]
         public bool deleted { get; set; }
 
-        [DataMember]
         public string type { get; set; }
 
-        [DataMember]
         public string by { get; set; }
 
-        [DataMember]
         public long time { get; set; }
 
-        [DataMember]
         public string text { get; set; }
 
-        [DataMember]
         public bool dead { get; set; }
 
-        [DataMember]
         public int parent { get; set; }
 
-        [DataMember]
         public int poll { get; set; }
-#pragma warning disable CA1819
-        [DataMember]
+#pragma warning disable CA1819        
         public int[] kids { get; set; }
-#pragma warning restore CA1819
-        [DataMember]
+#pragma warning restore CA1819        
         public string url { get; set; }
-        [DataMember]
         public uint score { get; set; }
 
-        [DataMember]
         public string title { get; set; }
-#pragma warning disable CA1819
-        [DataMember]
+#pragma warning disable CA1819        
         public uint[] parts { get; set; }
 #pragma warning restore CA1819
 
-        [DataMember]
         public uint descendants { get; set; }
 #pragma warning restore IDE1006
         #endregion
