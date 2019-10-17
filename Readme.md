@@ -2,7 +2,7 @@
 
 While preparing to work for a "real" WPF app I needed to teach myself MVVM. This project is the result of it. There are probably many different ways to achieve a similar result, so don´t take anything here for dogma.
 
-> I ported the ticker to net core 3.0, to see what changes had to be made, in the end I just had to change trivial stuff (a call to Process.Run). The solution now has 2 projects: in order to build any of them you **need to unload the other and clear the `obj` directory** prior to loading the project and building.
+> I ported the ticker to net core 3.0, to see what changes had to be made, in the end I just had to change trivial stuff (a call to Process.Run). The `master` branch now contains a pure net core solution. If you want the framework version, switch to the `framework branch`.
 
 #### Contents ####
 - [The View - Model - Model View (MVVM) pattern](#MVVM)
