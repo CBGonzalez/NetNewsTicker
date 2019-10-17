@@ -431,7 +431,9 @@ namespace NetNewsTicker.ViewModels
                 itemColors[butIndex] = visitedColor;
             }
             (_, string primary, _) = ((string, string, string))but.ToolTip;
-            var p = Process.Start(primary);
+            // hack for net core
+            string cleanUrl = primary.Replace("&", "^&");
+            var p = Process.Start(new ProcessStartInfo("cmd", $"/c start {cleanUrl}") { CreateNoWindow = true });
             p.Dispose();
             e.Handled = true;
         }
