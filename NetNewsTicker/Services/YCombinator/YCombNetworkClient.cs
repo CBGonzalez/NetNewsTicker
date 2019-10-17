@@ -1,27 +1,21 @@
-﻿using System;
+﻿using NetNewsTicker.Model;
+using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Net;
 using System.Net.Http;
-using System.Runtime.Serialization.Json;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-
-using NetNewsTicker.Model;
 
 namespace NetNewsTicker.Services
 {
     public class YCombNetworkClient : NetworkClientBase
     {
-
-        private readonly DataContractJsonSerializer jasonSer;
         private int currentMaxItem = 0;
         private bool mustRefresh = false;
 
         public YCombNetworkClient() : base()
         {
-            jasonSer = new DataContractJsonSerializer(new YCombItem().GetType());
             newsServerBase = new Uri("https://hacker-news.firebaseio.com/v0/");
             logFileName = "NewsTickerLog.txt";
         }
@@ -97,35 +91,32 @@ namespace NetNewsTicker.Services
             Logger.Log("Fetching highest item", Logger.Level.Information);
             try
             {
-                using (HttpResponseMessage response = await client.GetAsync("maxitem.json", cancel).ConfigureAwait(false))
+                using HttpResponseMessage response = await client.GetAsync("maxitem.json", cancel).ConfigureAwait(false);
+                if (!response.IsSuccessStatusCode)
                 {
-                    if (!response.IsSuccessStatusCode)
+                    error = $"{response.StatusCode}: { response.ReasonPhrase}";
+                    Logger.Log(error, Logger.Level.Error);
+                }
+                else
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    if (!int.TryParse(responseBody, out maxItem))
                     {
-                        error = $"{response.StatusCode}: { response.ReasonPhrase}";
+                        error = $"Trouble: error parsing maxitem. String returned was {responseBody}.";
                         Logger.Log(error, Logger.Level.Error);
-                        //return (isOk, 0, $"{response.StatusCode}: { response.ReasonPhrase}");               
                     }
                     else
                     {
-                        string responseBody = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                        if (!int.TryParse(responseBody, out maxItem))
-                        {
-                            error = $"Trouble: error parsing maxitem. String returned was {responseBody}.";
-                            Logger.Log(error, Logger.Level.Error);
-                        }
-                        else
-                        {
-                            isOk = true;
-                            needsRefresh = (maxItem > currentMaxItem) | mustRefresh;
-                            mustRefresh = false;
-                            currentMaxItem = maxItem;
-                            Logger.Log("GetMaxItem finished ok", Logger.Level.Information);
+                        isOk = true;
+                        needsRefresh = (maxItem > currentMaxItem) | mustRefresh;
+                        mustRefresh = false;
+                        currentMaxItem = maxItem;
+                        Logger.Log("GetMaxItem finished ok", Logger.Level.Information);
 #if DEBUG
-                            Logger.Log($"Value retrieved {maxItem}", Logger.Level.Debug);
+                        Logger.Log($"Value retrieved {maxItem}", Logger.Level.Debug);
 #endif
-                        }
-
                     }
+
                 }
             }
             catch (TaskCanceledException te)
@@ -156,7 +147,7 @@ namespace NetNewsTicker.Services
                     Logger.Log(error, Logger.Level.Error);
                     return (success, null, error);
                 }
-                ReadOnlyMemory<char> content = (await response.Content.ReadAsStringAsync().ConfigureAwait(false)).AsMemory();
+                ReadOnlyMemory<byte> content = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
                 newIds = GetIdsFromMem(content);
 #if DEBUG
                 Logger.Log($"Retrieved {newIds.Count} items for {page}", Logger.Level.Debug);
@@ -190,19 +181,24 @@ namespace NetNewsTicker.Services
             return (success, newIds, error);
         }
 
-        private static List<int> GetIdsFromMem(ReadOnlyMemory<char> content)
+        private static List<int> GetIdsFromMem(ReadOnlyMemory<byte> content)
         {
+            byte utfComma = 0x2C;
             var ids = new List<int>();
-            ReadOnlySpan<char> localContent = content.Span.Slice(1, content.Length - 2);
-            ReadOnlySpan<char> currentSlice = localContent.Slice(0);
-            int position = 0, commaPosition = localContent.IndexOf(',');
+            ReadOnlySpan<byte> localContent = content.Span.Slice(1, content.Length - 2);
+            ReadOnlySpan<byte> currentSlice = localContent.Slice(0);
+            int position = 0, commaPosition = localContent.IndexOf(utfComma);
             int counter = 0;
+
             while (commaPosition >= 0)
             {
-                ids.Add(int.Parse(new string(currentSlice.Slice(position, commaPosition).ToArray()), NumberStyles.Integer, CultureInfo.InvariantCulture));
+                if (Utf8Parser.TryParse(currentSlice.Slice(position, commaPosition), out int id, out _))
+                {
+                    ids.Add(id);
+                }
                 position = commaPosition + 1;
                 currentSlice = currentSlice.Slice(position);
-                commaPosition = currentSlice.IndexOf(',');
+                commaPosition = currentSlice.IndexOf(utfComma);
                 counter++;
             }
             return ids;
@@ -227,15 +223,11 @@ namespace NetNewsTicker.Services
                 {
                     error = $"{response.StatusCode.ToString()} {response.ReasonPhrase}";
                     Logger.Log(error, Logger.Level.Error);
-                    //return (success, null);
                 }
                 else
                 {
                     byte[] buff = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                    using (var ms = new MemoryStream(buff))
-                    {
-                        serType = jasonSer.ReadObject(ms) as YCombItem;
-                    }
+                    serType = JsonSerializer.Deserialize<YCombItem>(buff);
                     success = serType != null;
                 }
             }
