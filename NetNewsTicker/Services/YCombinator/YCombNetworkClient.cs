@@ -13,15 +13,21 @@ namespace NetNewsTicker.Services
     {
         private int currentMaxItem = 0;
         private bool mustRefresh = false;
+        private readonly Dictionary<int, YCombItem> cacheContent;
 
         public YCombNetworkClient() : base()
         {
             newsServerBase = new Uri("https://hacker-news.firebaseio.com/v0/");
             logFileName = "NewsTickerLog.txt";
+            cacheContent = new Dictionary<int, YCombItem>();
         }
 
         public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
         {
+            if(cacheContent.Count > 5000)
+            {
+                cacheContent.Clear();
+            }
             bool isOK;
             string error;
             mustRefresh = howManyItems <= 0;
@@ -216,38 +222,49 @@ namespace NetNewsTicker.Services
             bool success = false;
             string error = string.Empty;
             HttpResponseMessage response = null;
-            try
+            if (cacheContent.ContainsKey(itemID))
             {
-                response = await client.GetAsync($"item/{itemID}.json", cancel).ConfigureAwait(false);
-                if (!response.IsSuccessStatusCode)
+                serType = cacheContent[itemID];
+            }
+            else
+            {
+                try
                 {
-                    error = $"{response.StatusCode.ToString()} {response.ReasonPhrase}";
-                    Logger.Log(error, Logger.Level.Error);
+                    response = await client.GetAsync($"item/{itemID}.json", cancel).ConfigureAwait(false);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        error = $"{response.StatusCode.ToString()} {response.ReasonPhrase}";
+                        Logger.Log(error, Logger.Level.Error);
+                    }
+                    else
+                    {
+                        byte[] buff = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                        serType = JsonSerializer.Deserialize<YCombItem>(buff);
+                        success = serType != null;
+                        if (success)
+                        {
+                            cacheContent.Add(serType.id, serType);
+                        }
+                    }
                 }
-                else
+                catch (HttpRequestException e)
                 {
-                    byte[] buff = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
-                    serType = JsonSerializer.Deserialize<YCombItem>(buff);
-                    success = serType != null;
+                    Logger.Log(e.ToString(), Logger.Level.Error);
+                    serType = null;
+                    error += e.ToString();
                 }
-            }
-            catch (HttpRequestException e)
-            {
-                Logger.Log(e.ToString(), Logger.Level.Error);
-                serType = null;
-                error += e.ToString();
-            }
-            catch (TaskCanceledException te)
-            {
-                Logger.Log(te.ToString(), Logger.Level.Information);
-                serType = null;
-                error += te.ToString();
-            }
-            finally
-            {
-                if (response != null)
+                catch (TaskCanceledException te)
                 {
-                    response.Dispose();
+                    Logger.Log(te.ToString(), Logger.Level.Information);
+                    serType = null;
+                    error += te.ToString();
+                }
+                finally
+                {
+                    if (response != null)
+                    {
+                        response.Dispose();
+                    }
                 }
             }
             return (success, serType, error);
