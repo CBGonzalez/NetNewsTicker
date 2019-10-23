@@ -185,7 +185,7 @@ namespace NetNewsTicker.ViewModels
 
         private void InitializeItemsHandler()
         {
-            contentHandler = new ItemsHandler((int)refreshIntervalMin * 60, isLogEnabled);
+            contentHandler = new ItemsHandler((int)refreshIntervalMin * 60, isLogEnabled, selectedServiceIndex, selectedCategoryIndex);
             allServicesPages = contentHandler.AllServicesPages;
             LogCheckTooltip = contentHandler.LogPath;
             if (contentHandler.AllCategories != null)
@@ -198,8 +198,10 @@ namespace NetNewsTicker.ViewModels
                     aCat = new DropDownCategory(item.Item1, item.Item2);
                     ServicesList.Add(aCat);
                 }
-                PopulateCategories(0);
-                SelectedService = servicesList[0];
+                PopulateCategories(selectedServiceIndex, selectedCategoryIndex);
+                SelectedService = servicesList[selectedServiceIndex];
+                selectedNews = selectedServiceIndex;
+                selectedPage = selectedCategoryIndex;
             }
             contentHandler.ItemsRefreshCompletedHandler += ContentHandler_ItemsRefreshCompletedHandler;
             contentHandler.ItemsRefreshStartedHandler += ContentHandler_ItemsRefreshStartedHandler;
@@ -207,7 +209,7 @@ namespace NetNewsTicker.ViewModels
         }
 
         // Added to allow correct pages to display immediately after user selects new service
-        private void PopulateCategories(int forWhichService)
+        private void PopulateCategories(int forWhichService, int whichPage = 0)
         {
             DropDownCategory aCat;
             int counter = 0;
@@ -220,7 +222,7 @@ namespace NetNewsTicker.ViewModels
                     CategoriesList.Add(aCat);
                     counter++;
                 }
-                SelectedCategory = categoriesList[0];
+                SelectedCategory = categoriesList[whichPage];
             }
         }
 
