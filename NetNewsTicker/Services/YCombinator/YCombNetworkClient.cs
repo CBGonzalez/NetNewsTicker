@@ -24,7 +24,7 @@ namespace NetNewsTicker.Services
 
         public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
         {
-            if(cacheContent.Count > 5000)
+            if (cacheContent.Count > 5000)
             {
                 cacheContent.Clear();
             }
@@ -52,8 +52,8 @@ namespace NetNewsTicker.Services
                     for (int i = 0; i < howManyToFetch; i++)
                     {
                         (bool itemOK, YCombItem item, _) = await GetOneItemAsync(list[i], cancel).ConfigureAwait(false);
-                        isOK = itemOK;
-                        if (isOK)
+                        //isOK = itemOK;
+                        if (itemOK)
                         {
                             if (item != null)
                             {
