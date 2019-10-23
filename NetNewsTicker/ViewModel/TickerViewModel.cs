@@ -97,6 +97,7 @@ namespace NetNewsTicker.ViewModels
             // Get saved settings, if any
             userSettings = UserSettings.LoadSettings();
             primaryIsCurrent = userSettings.Primary;
+            UsePrimaryDisplay = primaryIsCurrent;
             topIsCurrent = userSettings.Top;
             refreshIntervalMin = userSettings.Refresh;
             currentServiceIndex = userSettings.Service;
@@ -108,7 +109,8 @@ namespace NetNewsTicker.ViewModels
             ShowSecDisplayRadioButton = secScreenWidth > 0 ? Visibility.Visible : Visibility.Hidden; // works for one gpu and 2 monitors
             if (ShowSecDisplayRadioButton == Visibility.Hidden && !primaryIsCurrent)
             {
-                primaryIsCurrent = false;
+                primaryIsCurrent = true;
+                UsePrimaryDisplay = true;
             }
             ShowPauseButton = Visibility.Hidden;
             ShowResumeButton = Visibility.Hidden;
@@ -681,6 +683,19 @@ namespace NetNewsTicker.ViewModels
                 if (usePrimaryDisplay != value)
                 {
                     usePrimaryDisplay = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool UseSecondaryDisplay
+        {
+            get => !usePrimaryDisplay;
+            set
+            {
+                if(!usePrimaryDisplay != value)
+                {
+                    usePrimaryDisplay = !value;
                     NotifyPropertyChanged();
                 }
             }
