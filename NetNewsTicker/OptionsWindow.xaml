@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        
+       
         xmlns:local="clr-namespace:NetNewsTicker"
         xmlns:localization="clr-namespace:NetNewsTicker.Localization"
         WindowStartupLocation="Manual"
@@ -53,7 +53,7 @@
         <ComboBox Grid.Row="3" Grid.Column="3" Grid.ColumnSpan="2" x:Name="displayCombo" ItemsSource="{Binding CategoriesList}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedCategory}" Width="125" Height="25" HorizontalAlignment="Left" VerticalAlignment="Center" SelectedIndex="{Binding SelectedCategoryIndex, Mode=TwoWay}" VerticalContentAlignment="Center"/>
         <!--<Button x:Name="btnDefaults" Content="{x:Static localization:Resources.DefaultsButton}" Margin="172,10,0,0" VerticalAlignment="Top" Width="75" HorizontalAlignment="Left" RenderTransformOrigin="0.78,0.55" Background="#FFB8F5B2"/> -->
         <RadioButton Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" x:Name="radioPrimary" Content="{x:Static localization:Resources.RadioPrimDisplay}" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.306,-0.233" IsChecked="{Binding UsePrimaryDisplay, FallbackValue=true, Mode=TwoWay}" GroupName="Displays" Foreground="White"/>
-        <RadioButton Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2" x:Name="radioSecondary" Content="{x:Static localization:Resources.RadioSecDisplay}" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="{Binding ShowSecDisplayRadioButton, Mode=TwoWay}" RenderTransformOrigin="0.306,-0.233" GroupName="Displays" Foreground="White"/>
+        <RadioButton Grid.Row="4" Grid.Column="3" Grid.ColumnSpan="2" x:Name="radioSecondary" Content="{x:Static localization:Resources.RadioSecDisplay}" HorizontalAlignment="Left" VerticalAlignment="Center" Visibility="{Binding ShowSecDisplayRadioButton, Mode=TwoWay}" RenderTransformOrigin="0.306,-0.233" IsChecked="{Binding UseSecondaryDisplay, FallbackValue=true, Mode=TwoWay}" GroupName="Displays" Foreground="White"/>
         <RadioButton Grid.Row="5" Grid.Column="1" Grid.ColumnSpan="2" x:Name="radioTop" Content="{x:Static localization:Resources.RadioTop}" IsChecked="{Binding UseTopTicker, FallbackValue=true, Mode=TwoWay}" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
         <RadioButton Grid.Row="5" Grid.Column="3" Grid.ColumnSpan="2" x:Name="radioBottom" Content="{x:Static localization:Resources.RadioBottom}" HorizontalAlignment="Left" VerticalAlignment="Center" RenderTransformOrigin="0.306,-0.233" GroupName="TopBottom" Foreground="White"/>
         <CheckBox Grid.Row="6" Grid.Column="1" Grid.ColumnSpan="2" Content="{x:Static localization:Resources.CheckboxLogging}" IsChecked="{Binding IsLogEnabled}" ToolTip="{Binding LogCheckTooltip}" HorizontalAlignment="Left" VerticalAlignment="Center" Foreground="White"/>

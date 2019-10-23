@@ -63,7 +63,7 @@ namespace NetNewsTicker.Model
 
         public bool IsServiceRefreshing => tickerService.IsRefreshing;
 
-        public ItemsHandler(int refreshIntervalSeconds, bool useLogging)
+        public ItemsHandler(int refreshIntervalSeconds, bool useLogging, int selectedService = 0, int selectedPage = 0)
         {
             logEnabled = useLogging;
             hasNewItems = false;
@@ -73,7 +73,8 @@ namespace NetNewsTicker.Model
             {
                 allServices.Add((s.Key, s.Value));
             }
-            currentService = 0;
+            currentService = selectedService;
+            currentCategory = selectedPage;
             maxService = allServices.Count - 1;
             tickerService = ServiceSelector.CreateService(currentService, logEnabled);
             logPath = tickerService.LogPath;

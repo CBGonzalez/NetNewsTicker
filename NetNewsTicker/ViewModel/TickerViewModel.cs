@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NetNewsTicker.Model;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -8,7 +9,6 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using NetNewsTicker.Model;
 
 namespace NetNewsTicker.ViewModels
 {
@@ -18,6 +18,7 @@ namespace NetNewsTicker.ViewModels
 
         private const int defRefreshDelayMs = 6;
         private const double buttonWidth = 250.0;
+        private readonly UserSettings userSettings;
 
         private readonly int refreshDelay = defRefreshDelayMs;
         private readonly Brush oldItemColor = Brushes.LightBlue, newItemColor = Brushes.LightGreen, visitedColor = Brushes.LightYellow;
@@ -93,20 +94,31 @@ namespace NetNewsTicker.ViewModels
             taskBarHeight = SystemParameters.PrimaryScreenHeight - SystemParameters.WorkArea.Height;
 
             // Set defaults
-            primaryIsCurrent = true;
-            topIsCurrent = true;
+            // Get saved settings, if any
+            userSettings = UserSettings.LoadSettings();
+            primaryIsCurrent = userSettings.Primary;
+            UsePrimaryDisplay = primaryIsCurrent;
+            topIsCurrent = userSettings.Top;
+            refreshIntervalMin = userSettings.Refresh;
+            currentServiceIndex = userSettings.Service;
+            currentCategoryIndex = userSettings.Page;
+
             isTopMost = true;
-            UsePrimaryDisplay = true;
-            primaryIsCurrent = true;
-            UseTopTicker = true;
+            UsePrimaryDisplay = primaryIsCurrent;
+            UseTopTicker = topIsCurrent;
             ShowSecDisplayRadioButton = secScreenWidth > 0 ? Visibility.Visible : Visibility.Hidden; // works for one gpu and 2 monitors
+            if (ShowSecDisplayRadioButton == Visibility.Hidden && !primaryIsCurrent)
+            {
+                primaryIsCurrent = true;
+                UsePrimaryDisplay = true;
+            }
             ShowPauseButton = Visibility.Hidden;
             ShowResumeButton = Visibility.Hidden;
             ShowOptionsWindow = Visibility.Hidden;
             buttonTypeFace = new Typeface(new FontFamily("Segoe UI"), FontStyles.Normal, FontWeights.Normal, FontStretches.Normal);
             isDoingRefresh = false;
-            selectedCategoryIndex = currentCategoryIndex = 0;
-            selectedServiceIndex = currentServiceIndex = 0;
+            selectedCategoryIndex = currentCategoryIndex;
+            selectedServiceIndex = currentServiceIndex;
 
             refreshIntervalMin = defaultRefreshMin;
             currentRefreshMin = refreshIntervalMin;
@@ -173,7 +185,7 @@ namespace NetNewsTicker.ViewModels
 
         private void InitializeItemsHandler()
         {
-            contentHandler = new ItemsHandler((int)refreshIntervalMin * 60, isLogEnabled);
+            contentHandler = new ItemsHandler((int)refreshIntervalMin * 60, isLogEnabled, selectedServiceIndex, selectedCategoryIndex);
             allServicesPages = contentHandler.AllServicesPages;
             LogCheckTooltip = contentHandler.LogPath;
             if (contentHandler.AllCategories != null)
@@ -186,8 +198,10 @@ namespace NetNewsTicker.ViewModels
                     aCat = new DropDownCategory(item.Item1, item.Item2);
                     ServicesList.Add(aCat);
                 }
-                PopulateCategories(0);
-                SelectedService = servicesList[0];
+                PopulateCategories(selectedServiceIndex, selectedCategoryIndex);
+                SelectedService = servicesList[selectedServiceIndex];
+                selectedNews = selectedServiceIndex;
+                selectedPage = selectedCategoryIndex;
             }
             contentHandler.ItemsRefreshCompletedHandler += ContentHandler_ItemsRefreshCompletedHandler;
             contentHandler.ItemsRefreshStartedHandler += ContentHandler_ItemsRefreshStartedHandler;
@@ -195,7 +209,7 @@ namespace NetNewsTicker.ViewModels
         }
 
         // Added to allow correct pages to display immediately after user selects new service
-        private void PopulateCategories(int forWhichService)
+        private void PopulateCategories(int forWhichService, int whichPage = 0)
         {
             DropDownCategory aCat;
             int counter = 0;
@@ -208,7 +222,7 @@ namespace NetNewsTicker.ViewModels
                     CategoriesList.Add(aCat);
                     counter++;
                 }
-                SelectedCategory = categoriesList[0];
+                SelectedCategory = categoriesList[whichPage];
             }
         }
 
@@ -488,17 +502,19 @@ namespace NetNewsTicker.ViewModels
             ShowOptionsWindow = Visibility.Visible;
         }
 
-        private void SaveOptionsClick()
+        private async void SaveOptionsClick()
         {
             ShowOptionsWindow = Visibility.Hidden;
             if (refreshIntervalMin != currentRefreshMin)
             {
                 currentRefreshMin = refreshIntervalMin;
+                userSettings.Refresh = currentRefreshMin;
                 contentHandler.ChangeRefreshInterval((int)refreshIntervalMin * 60);
             }
             if (selectedNews != SelectedService.Id)
             {
                 selectedNews = SelectedService.Id;
+                userSettings.Service = selectedNews;
                 currentServiceIndex = selectedNews;
                 ShowItemButtons = Visibility.Hidden;
                 ShowInfoButton = Visibility.Visible;
@@ -515,6 +531,7 @@ namespace NetNewsTicker.ViewModels
             if (selectedPage != SelectedCategory.Id)
             {
                 selectedPage = SelectedCategory.Id;
+                userSettings.Page = selectedPage;
                 contentHandler.ChangeCurrentCategory(selectedPage);
                 ShowItemButtons = Visibility.Hidden;
                 ShowInfoButton = Visibility.Visible;
@@ -524,12 +541,14 @@ namespace NetNewsTicker.ViewModels
             if (usePrimaryDisplay != primaryIsCurrent)
             {
                 primaryIsCurrent = usePrimaryDisplay;
+                userSettings.Primary = primaryIsCurrent;
                 SetupWindows(usePrimaryDisplay);
                 ResetPositions();
             }
             if (useTopTicker != topIsCurrent)
             {
                 topIsCurrent = useTopTicker;
+                userSettings.Top = topIsCurrent;
                 MoveWindowUpDown(useTopTicker);
             }
             if (isLogEnabled != currentLogging)
@@ -538,6 +557,7 @@ namespace NetNewsTicker.ViewModels
                 ModifyLogging(isLogEnabled);
                 LogCheckTooltip = contentHandler.LogPath;
             }
+            _ = await UserSettings.SaveSettings(userSettings);
         }
 
         private void CancelOptionsClick()
@@ -665,6 +685,19 @@ namespace NetNewsTicker.ViewModels
                 if (usePrimaryDisplay != value)
                 {
                     usePrimaryDisplay = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+        public bool UseSecondaryDisplay
+        {
+            get => !usePrimaryDisplay;
+            set
+            {
+                if(!usePrimaryDisplay != value)
+                {
+                    usePrimaryDisplay = !value;
                     NotifyPropertyChanged();
                 }
             }
