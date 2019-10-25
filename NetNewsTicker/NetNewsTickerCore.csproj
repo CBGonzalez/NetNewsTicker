@@ -36,6 +36,7 @@
     <Compile Remove="out\NetNewsTicker\**\*.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.3" />
     <PackageReference Include="Microsoft.Windows.Compatibility" Version="3.1.0-preview1.19504.10" />
   </ItemGroup>
 </Project>

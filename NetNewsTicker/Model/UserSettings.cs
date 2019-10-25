@@ -7,7 +7,7 @@ namespace NetNewsTicker.Model
 {
     public class UserSettings
     {
-        private static readonly string settingsFileName = "NETNewsTicker\\NetNewsTicker.json";
+        private const string settingsFileName = "NETNewsTicker\\NetNewsTicker.json";
         private static string fullPath = string.Empty;
 
         public int Service { get; set; } = 0;
@@ -37,7 +37,7 @@ namespace NetNewsTicker.Model
             bool result = false;
             if(settings != null && fullPath.Length > 0)
             {
-                await File.WriteAllTextAsync(fullPath, JsonSerializer.Serialize(settings));
+                await File.WriteAllTextAsync(fullPath, JsonSerializer.Serialize(settings)).ConfigureAwait(false);
                 result = true;
             }
             return result;
