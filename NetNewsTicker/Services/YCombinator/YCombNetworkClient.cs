@@ -23,7 +23,7 @@ namespace NetNewsTicker.Services
         }
 
         public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
-        {
+        {            
             if (cacheContent.Count > 5000)
             {
                 cacheContent.Clear();
@@ -39,7 +39,7 @@ namespace NetNewsTicker.Services
             (bool success, bool needsRefreshing, string errorMsg) = await GetMaxItemAsync(cancel).ConfigureAwait(false);
             isOK = success;
             error = errorMsg;
-            if (isOK && needsRefreshing && !cancel.IsCancellationRequested)
+            if (isOK && (needsRefreshing || mustRefresh) && !cancel.IsCancellationRequested)
             {
                 (bool fetchedOK, List<int> list, string errorMessage) = await FetchItemIdsForPageAsync(itemsURL, cancel).ConfigureAwait(false);
                 isOK = fetchedOK;
@@ -67,7 +67,7 @@ namespace NetNewsTicker.Services
                     }
                 }
             }
-            return (isOK & needsRefreshing, fetchedItems, error);
+            return (isOK & (needsRefreshing | mustRefresh), fetchedItems, error);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace NetNewsTicker.Services
         private async Task<(bool, YCombItem, string)> GetOneItemAsync(int itemID, CancellationToken cancel)
         {
             var serType = new YCombItem();
-            bool success = false;
+            bool success = true;
             string error = string.Empty;
             HttpResponseMessage response = null;
             if (cacheContent.ContainsKey(itemID))
@@ -252,6 +252,7 @@ namespace NetNewsTicker.Services
                     Logger.Log(e.ToString(), Logger.Level.Error);
                     serType = null;
                     error += e.ToString();
+                    success = false;
                 }
                 catch (TaskCanceledException te)
                 {

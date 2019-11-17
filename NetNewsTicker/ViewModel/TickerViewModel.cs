@@ -230,7 +230,14 @@ namespace NetNewsTicker.ViewModels
                     CategoriesList.Add(aCat);
                     counter++;
                 }
-                SelectedCategory = categoriesList[whichPage];
+                if (whichPage < categoriesList.Count) // just to make sure ...
+                {
+                    SelectedCategory = categoriesList[whichPage];
+                }
+                else
+                {
+                    SelectedCategory = categoriesList[categoriesList.Count - 1];
+                }
             }
         }
 
