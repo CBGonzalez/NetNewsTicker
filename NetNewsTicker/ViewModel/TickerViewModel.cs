@@ -39,6 +39,7 @@ namespace NetNewsTicker.ViewModels
         #region backer fields
         private ObservableCollection<DropDownCategory> categoriesList;
         private ObservableCollection<DropDownCategory> servicesList;
+
         private Visibility showOptionsWindow, showPauseButton, showResumeButton, showInfoButton = Visibility.Visible, showItemButtons = Visibility.Hidden, showSecDisplayRadioButton, isRefreshingNews = Visibility.Hidden;
         private bool usePrimaryDisplay, primaryIsCurrent, useTopTicker, topIsCurrent;
         private bool isTopMost;
@@ -52,6 +53,7 @@ namespace NetNewsTicker.ViewModels
         private ObservableCollection<string> headlines;
         private ObservableCollection<(string, string, string)> urls;
         private ObservableCollection<Brush> itemColors;
+        private ObservableCollection<Visibility> buttonVisibility;
         private double displayWidth;
         private bool canPause = true;
         private bool isDoingRefresh;
@@ -82,10 +84,16 @@ namespace NetNewsTicker.ViewModels
         public ObservableCollection<string> Headlines => headlines;
         public ObservableCollection<(string, string, string)> Urls => urls;
         public ObservableCollection<Brush> ItemColors => itemColors;
+
+        public ObservableCollection<Visibility> ButtonVisibility => buttonVisibility;
         #endregion
 
         public TickerViewModel() : base()
         {
+            // freeze brushes
+            oldItemColor.Freeze();
+            newItemColor.Freeze();
+            visitedColor.Freeze();
             // Get monitor info
             primScreenWidth = SystemParameters.PrimaryScreenWidth;
             secScreenWidth = SystemParameters.VirtualScreenWidth - SystemParameters.PrimaryScreenWidth; // TODO handle more than 2 monitors?
@@ -222,7 +230,14 @@ namespace NetNewsTicker.ViewModels
                     CategoriesList.Add(aCat);
                     counter++;
                 }
-                SelectedCategory = categoriesList[whichPage];
+                if (whichPage < categoriesList.Count) // just to make sure ...
+                {
+                    SelectedCategory = categoriesList[whichPage];
+                }
+                else
+                {
+                    SelectedCategory = categoriesList[categoriesList.Count - 1];
+                }
             }
         }
 
@@ -232,23 +247,25 @@ namespace NetNewsTicker.ViewModels
             positions = new ObservableCollection<double>();
             headlines = new ObservableCollection<string>();
             itemColors = new ObservableCollection<Brush>();
+            buttonVisibility = new ObservableCollection<Visibility>();
             urls = new ObservableCollection<(string, string, string)>();
 
-            infoButton = new Button() { Content = "...", Width = buttonWidth, Height = 30, Background = Brushes.LightGreen, Name = "B0", FontSize = 16, FontWeight = FontWeights.Bold };
+            infoButton = new Button() { Content = "...", Width = buttonWidth, Height = 30, Background = newItemColor, Name = "B0", FontSize = 16, FontWeight = FontWeights.Bold };
             itemColors.Add(Brushes.LightGreen);
             headlines.Add("Fetching items...");
             positions.Add(displayWidth - buttonWidth);
+            buttonVisibility.Add(Visibility.Visible);
             urls.Add((string.Empty, string.Empty, string.Empty));
 
             var binding = new Binding($"Positions[{0}]") { Mode = BindingMode.OneWay }; ;
             _ = infoButton.SetBinding(Canvas.LeftProperty, binding);
             binding = new Binding("ShowInfoButton") { Mode = BindingMode.OneWay };
-            infoButton.SetBinding(Button.VisibilityProperty, binding);
+            _ = infoButton.SetBinding(Button.VisibilityProperty, binding);
             NewsButtons.Add(infoButton); //Special button at position 0
 
             binding = new Binding("ShowItemButtons") { Mode = BindingMode.OneWay };
 
-            Binding posBinding, contentBinding, toolTipBinding, backgroundBinding;
+            Binding posBinding, contentBinding, toolTipBinding, backgroundBinding, visibilityBinding;
             Button but;
             //prepare fixed number of buttons
             //TODO make number of headlines configurable
@@ -257,6 +274,7 @@ namespace NetNewsTicker.ViewModels
                 positions.Add(displayWidth + i * buttonWidth + 2);
                 headlines.Add(string.Empty);
                 itemColors.Add(oldItemColor);
+                buttonVisibility.Add(Visibility.Hidden);
                 urls.Add((string.Empty, string.Empty, string.Empty));
 
                 but = new Button() { Width = buttonWidth, Height = 30, Name = $"B{i}" };
@@ -273,6 +291,9 @@ namespace NetNewsTicker.ViewModels
 
                 backgroundBinding = new Binding($"ItemColors[{i}]") { Mode = BindingMode.Default };
                 but.SetBinding(Button.BackgroundProperty, backgroundBinding);
+
+                visibilityBinding = new Binding($"ButtonVisibility[{i}]") { Mode = BindingMode.Default };
+                but.SetBinding(Button.VisibilityProperty, visibilityBinding);
 
                 but.Click += But_Click;
                 but.MouseRightButtonDown += But_MouseRightButtonDown;
@@ -291,6 +312,7 @@ namespace NetNewsTicker.ViewModels
                 for (int i = 0; i < Positions.Count; i++)
                 {
                     Positions[i] = displayWidth - (2 * buttonWidth) + (i * buttonWidth) + 2;
+                    ButtonVisibility[i] = Visibility.Hidden;
                 }
                 animateOn = true;
             }
@@ -319,11 +341,20 @@ namespace NetNewsTicker.ViewModels
                         tail = i != 0 ? i - 1 : Positions.Count - 1; // First item goes behind last, others behind previous
                         if (i == 0 && ShowInfoButton == Visibility.Visible)
                         {
-                            pos = pos + buttonWidth >= 0 ? pos : displayWidth;
+                            Positions[i] = pos + buttonWidth >= 0 ? pos : displayWidth;
+                            break;
                         }
                         else
                         {
                             pos = pos + buttonWidth >= 0 ? pos : Positions[tail] + buttonWidth + 2;
+                            if (pos > displayWidth)
+                            {
+                                ButtonVisibility[i] = Visibility.Hidden;
+                            }
+                            else
+                            {
+                                ButtonVisibility[i] = Visibility.Visible;
+                            }
                         }
                         Positions[i] = pos;
                     }
@@ -429,7 +460,7 @@ namespace NetNewsTicker.ViewModels
             {
                 // var p = Process.Start(secondary);
                 // hack for net core
-                string cleanUrl = secondary.Replace("&", "^&");
+                string cleanUrl = secondary.Replace("&", "^&", StringComparison.InvariantCulture);
                 var p = Process.Start(new ProcessStartInfo("cmd", $"/c start {cleanUrl}") { CreateNoWindow = true });
                 p.Dispose();
             }
@@ -446,7 +477,7 @@ namespace NetNewsTicker.ViewModels
             }
             (_, string primary, _) = ((string, string, string))but.ToolTip;
             // hack for net core
-            string cleanUrl = primary.Replace("&", "^&");
+            string cleanUrl = primary.Replace("&", "^&", StringComparison.InvariantCulture);
             var p = Process.Start(new ProcessStartInfo("cmd", $"/c start {cleanUrl}") { CreateNoWindow = true });
             p.Dispose();
             e.Handled = true;
@@ -557,7 +588,7 @@ namespace NetNewsTicker.ViewModels
                 ModifyLogging(isLogEnabled);
                 LogCheckTooltip = contentHandler.LogPath;
             }
-            _ = await UserSettings.SaveSettings(userSettings);
+            _ = await UserSettings.SaveSettings(userSettings).ConfigureAwait(false);
         }
 
         private void CancelOptionsClick()
@@ -695,7 +726,7 @@ namespace NetNewsTicker.ViewModels
             get => !usePrimaryDisplay;
             set
             {
-                if(!usePrimaryDisplay != value)
+                if (!usePrimaryDisplay != value)
                 {
                     usePrimaryDisplay = !value;
                     NotifyPropertyChanged();

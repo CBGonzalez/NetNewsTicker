@@ -61,7 +61,7 @@ namespace NetNewsTicker.Services.RSS
 
         public override int GetHashCode()
         {
-            return itemHeadline.GetHashCode();
+            return itemHeadline.GetHashCode(StringComparison.InvariantCulture);
 
         }
     }
