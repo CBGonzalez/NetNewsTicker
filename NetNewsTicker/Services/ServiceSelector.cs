@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using NetNewsTicker.Services.RSS.BBCNewsRSS;
 using NetNewsTicker.Services.RSS.RedditRSS;
+using NetNewsTicker.Services.RSS.ArsTechnicaRSS;
 
 namespace NetNewsTicker.Services
 {
     public static class ServiceSelector
     {
-        private static readonly Dictionary<int, string> serviceList = new Dictionary<int, string>() { { 0, "Hacker News" }, { 1, "Reddit" }, { 2, "BBC News" } };
+        private static readonly Dictionary<int, string> serviceList = new Dictionary<int, string>() { { 0, "Hacker News" }, { 1, "Reddit" }, { 2, "BBC News" }, { 3, "Ars Technica" } };
         private static readonly Dictionary<int, List<string>> servicesItems;
         private static ITickerCommunicationService service = null;
-        private const int maxServiceIndex = 2;
+        private static readonly int maxServiceIndex = serviceList.Count - 1;
 
         static ServiceSelector()
         {
@@ -54,6 +55,9 @@ namespace NetNewsTicker.Services
                     break;
                 case 2:
                     service = new BBCNewsRSSNewsService(useLogging);
+                    break;
+                case 3:
+                    service = new ArsTechnicaRSSNewsService(useLogging);
                     break;
             }
             return service;
