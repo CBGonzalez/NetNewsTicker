@@ -47,7 +47,8 @@ namespace NetNewsTicker.ViewModels
         //options window
         private double optionsTop, optionsLeft;
 
-        private readonly double primScreenWidth, secScreenWidth, primScreenHeight, secScreenHeight, taskBarHeight;
+        private readonly double primScreenWidth, secScreenWidth, primScreenHeight, secScreenHeight, taskBarHeight, 
+            secondaryHorOffset, secondaryVerOffset, virtualScreenWidth, virtualScreenHeight;
         private ObservableCollection<Button> newsButtons;
         private ObservableCollection<double> positions;
         private ObservableCollection<string> headlines;
@@ -95,11 +96,16 @@ namespace NetNewsTicker.ViewModels
             newItemColor.Freeze();
             visitedColor.Freeze();
             // Get monitor info
+            
+            virtualScreenWidth = SystemParameters.VirtualScreenWidth;
+            virtualScreenHeight = SystemParameters.VirtualScreenHeight;            
             primScreenWidth = SystemParameters.PrimaryScreenWidth;
-            secScreenWidth = SystemParameters.VirtualScreenWidth - SystemParameters.PrimaryScreenWidth; // TODO handle more than 2 monitors?
+            secScreenWidth = virtualScreenWidth - SystemParameters.PrimaryScreenWidth; // TODO handle more than 2 monitors?
             primScreenHeight = SystemParameters.WorkArea.Height;
-            secScreenHeight = SystemParameters.VirtualScreenHeight;
-            taskBarHeight = SystemParameters.PrimaryScreenHeight - SystemParameters.WorkArea.Height;
+            secScreenHeight = virtualScreenHeight;
+            taskBarHeight = SystemParameters.PrimaryScreenHeight - SystemParameters.WorkArea.Height; 
+            secondaryHorOffset = SystemParameters.VirtualScreenLeft;
+            secondaryVerOffset = SystemParameters.VirtualScreenTop;
 
             // Set defaults
             // Get saved settings, if any
@@ -112,7 +118,7 @@ namespace NetNewsTicker.ViewModels
             currentCategoryIndex = userSettings.Page;
 
             isTopMost = true;
-            UsePrimaryDisplay = primaryIsCurrent;
+            //UsePrimaryDisplay = primaryIsCurrent;
             UseTopTicker = topIsCurrent;
             ShowSecDisplayRadioButton = secScreenWidth > 0 ? Visibility.Visible : Visibility.Hidden; // works for one gpu and 2 monitors
             if (ShowSecDisplayRadioButton == Visibility.Hidden && !primaryIsCurrent)
@@ -130,11 +136,20 @@ namespace NetNewsTicker.ViewModels
 
             refreshIntervalMin = defaultRefreshMin;
             currentRefreshMin = refreshIntervalMin;
-
+            SystemParameters.StaticPropertyChanged += SystemParameters_StaticPropertyChanged;
             SetupWindows(UsePrimaryDisplay);
             InitializeBindingCommands();
             InitializeItemsHandler();
             CreateInitialItems();
+        }
+
+        private void SystemParameters_StaticPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "VirtualScreenWidth")
+            {
+                // do something
+                
+            }
         }
 
         private void SetupWindows(bool usePrimary)
@@ -142,7 +157,8 @@ namespace NetNewsTicker.ViewModels
             Width = usePrimary ? primScreenWidth - 2 : secScreenWidth - 2;
             ViewWidth = Width - 4 * 16 - 4;
             double currentHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;
-            Top = topIsCurrent ? 1 : currentHeight - 32 - 1 - taskBarHeight;
+            double currentVirtualTop = primaryIsCurrent ? 1 : secondaryVerOffset + 1;
+            Top = topIsCurrent ? currentVirtualTop : currentVirtualTop + currentHeight - 32 - 1 - taskBarHeight;
             OptionsTop = topIsCurrent ? Top + 33 : Top - optWindowHeight;
             if (!topIsCurrent && !usePrimary)
             {
@@ -155,7 +171,14 @@ namespace NetNewsTicker.ViewModels
             }
             else
             {
-                Left = primScreenWidth + 1;
+                if (secondaryHorOffset < 0)
+                {
+                    Left = secondaryHorOffset + 1;
+                }
+                else
+                {
+                    Left = primScreenWidth + 1;
+                }                
                 OptionsLeft = Left + Width - optWindowWidth;
             }
 
@@ -163,20 +186,33 @@ namespace NetNewsTicker.ViewModels
 
         private void MoveWindowUpDown(bool toUp)
         {
-            double currHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;
+            double currentHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;
+            double currentVirtualTop = primaryIsCurrent ? 1 : secondaryVerOffset + 1;
+            Top = topIsCurrent ? currentVirtualTop : currentVirtualTop + currentHeight - 32 - 1 - taskBarHeight;
+            OptionsTop = topIsCurrent ? Top + 33 : Top - optWindowHeight;
+            if (!topIsCurrent && !primaryIsCurrent)
+            {
+                OptionsTop = optionsTop - taskBarHeight;
+            }
+            /*//double currentHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;
+            double currentVirtualTop = primaryIsCurrent ? 1 : secondaryVerOffset + 1;
             if (toUp)
             {
-                Top = 1;
+                //Top = 1;
+                
+                double currentHeight = primaryIsCurrent ? primScreenHeight : secScreenHeight;
+                Top = topIsCurrent ? currentVirtualTop : currentVirtualTop + currentHeight - 32 - 1 - taskBarHeight;
                 OptionsTop = Top + 33;
                 IsTopmost = true;
             }
             else
             {
-                Top = currHeight - 32 - 1;
+                //Top = currHeight - 32 - 1;
+                Top = currentVirtualTop - 32 - 1;
                 Top = usePrimaryDisplay ? top : top - taskBarHeight;
                 OptionsTop = Top - optWindowHeight;
                 IsTopmost = false;
-            }
+            }*/
         }
 
         private void InitializeBindingCommands()

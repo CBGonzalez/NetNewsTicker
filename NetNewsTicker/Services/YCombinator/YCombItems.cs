@@ -52,7 +52,7 @@ namespace NetNewsTicker.Services
         public bool HasSubItems => kids != null;
 
         public bool HasSummary => false;
-        public string ItemHeadline => HasSubItems ? $"({kids.Length}) {title}" : $"(0) {title}";
+        public string ItemHeadline => HasSubItems ? $"({score} {kids.Length}) {title}" : $"({score} 0) {title}";
         public string ItemSummary => string.Empty;
         public Memory<int> SubItems => kids.AsMemory();
         public DateTime ItemCreationDate => UnTime.UtcDateTime;

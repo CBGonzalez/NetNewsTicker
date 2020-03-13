@@ -23,7 +23,7 @@ namespace NetNewsTicker.Services
         }
 
         public override async Task<(bool, List<IContentItem>, string)> FetchAllItemsAsync(string itemsURL, int howManyItems, CancellationToken cancel)
-        {            
+        {
             if (cacheContent.Count > 5000)
             {
                 cacheContent.Clear();
@@ -94,6 +94,24 @@ namespace NetNewsTicker.Services
             string error = string.Empty;
             int maxItem = 0;
             bool needsRefresh = false;
+            // testing changed items
+            //var utf8 = new System.Text.UTF8Encoding(false, false);
+            //using (HttpResponseMessage respUpdates = await client.GetAsync("updates.json", cancel).ConfigureAwait(false))
+            //{
+            //    if (!respUpdates.IsSuccessStatusCode)
+            //    {
+            //        error = $"{respUpdates.StatusCode}: { respUpdates.ReasonPhrase}";
+            //        Logger.Log(error, Logger.Level.Error);
+            //    }
+            //    else
+            //    {
+            //        byte[] buff = await respUpdates.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+            //        var updates = new YCombUpdate();
+            //        string jsonMessage = utf8.GetString(buff).Trim();
+            //        updates = JsonSerializer.Deserialize<YCombUpdate>(buff);
+            //    }
+            //}
+            //end testing
             Logger.Log("Fetching highest item", Logger.Level.Information);
             try
             {
@@ -239,6 +257,8 @@ namespace NetNewsTicker.Services
                     else
                     {
                         byte[] buff = await response.Content.ReadAsByteArrayAsync().ConfigureAwait(false);
+                        //var utf8 = new System.Text.UTF8Encoding(false, false);
+                        //string rawJson = utf8.GetString(buff);
                         serType = JsonSerializer.Deserialize<YCombItem>(buff);
                         success = serType != null;
                         if (success)
